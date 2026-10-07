@@ -1,0 +1,327 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pana — variación póster</title>
+<style>
+/* =====================================================================
+   PANA — VARIACIÓN PÓSTER (propuesta para Bruno)
+   Mismo contenido que el sitio, vestido como una hoja de marca:
+   columnas giradas, recuadros, damero, pila de logos, eco de contornos,
+   imagen en puntos, bloques de píxeles y letra chica tipo legal.
+   Lienzo 1920x1080 escalado (igual que el sitio de Bruno).
+   ===================================================================== */
+@font-face{ font-family:"Heavy"; src:url("../fonts/PPRightGrotesk-CompactBlack.woff2") format("woff2"); }
+@font-face{ font-family:"Reg";   src:url("../fonts/PPRightGrotesk-CompactRegular.woff2") format("woff2"); }
+:root{ --red:#f50000; --bg:#0b0b0b; }
+*{ margin:0; padding:0; box-sizing:border-box; }
+html,body{ height:100%; background:var(--bg); overflow:hidden; }
+body{ color:var(--red); font-family:"Heavy",sans-serif; text-transform:uppercase; -webkit-font-smoothing:antialiased; }
+.viewport{ position:fixed; inset:0; display:flex; align-items:center; justify-content:center; }
+.stage{ position:relative; width:1920px; height:1080px; flex:0 0 auto; transform:scale(var(--k,1)); }
+
+.micro{ font-family:"Heavy"; font-size:13px; line-height:1.05; letter-spacing:.01em; }
+.micro.r{ font-family:"Reg"; }
+.box{ border:2.5px solid var(--red); }
+
+/* ---------- marco fijo ---------- */
+.top{ position:absolute; left:260px; right:200px; top:34px; display:flex; justify-content:space-between; align-items:center; }
+.brand{ font-size:30px; letter-spacing:-.02em; }
+.brand sup{ font-size:.45em; vertical-align:top; }
+.nav{ display:flex; gap:10px; }
+.nav button{ background:none; border:2.5px solid var(--red); color:var(--red); font:inherit; font-size:16px; padding:6px 12px 4px; cursor:pointer; text-transform:uppercase; }
+.nav button.on, .nav button:hover{ background:var(--red); color:var(--bg); }
+
+.colL{ position:absolute; left:52px; top:96px; width:128px; height:888px; }
+.colL .frame{ position:absolute; inset:0; }
+.colL .big{ position:absolute; left:50%; top:50%; transform:translate(-50%,-50%) rotate(90deg); white-space:nowrap; font-size:92px; line-height:.8; letter-spacing:-.02em; }
+.colL .tag{ position:absolute; left:-2.5px; right:-2.5px; bottom:-2.5px; height:150px; border:2.5px solid var(--red); display:flex; align-items:center; justify-content:center; }
+.colL .tag span{ transform:rotate(90deg); white-space:nowrap; }
+.colL2{ position:absolute; left:190px; top:96px; height:888px; width:40px; }
+.colL2 .v{ position:absolute; left:50%; top:0; transform-origin:0 0; transform:rotate(90deg) translate(0,-50%); white-space:nowrap; font-size:30px; line-height:.86; }
+.colL2 .v small{ display:block; font-size:30px; }
+
+.colR{ position:absolute; right:40px; top:96px; width:110px; height:888px; }
+.colR .v{ position:absolute; left:50%; top:0; transform-origin:0 0; transform:rotate(90deg) translate(0,-50%); white-space:nowrap; font-size:40px; line-height:.86; }
+.badge{ position:absolute; right:32px; bottom:70px; width:126px; height:126px; animation:spin 22s linear infinite; }
+@keyframes spin{ to{ transform:rotate(360deg); } }
+
+.bottom{ position:absolute; left:260px; right:200px; bottom:30px; display:flex; justify-content:space-between; align-items:flex-end; }
+.counter{ font-size:22px; }
+
+/* ---------- ventana de contenido (pantalla con bordes fundidos, guiño a Bruno) ---------- */
+.win{ position:absolute; left:260px; top:100px; width:1460px; height:900px; overflow:hidden;
+  -webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 5%,#000 95%,transparent 100%);
+          mask-image:linear-gradient(to bottom,transparent 0,#000 5%,#000 95%,transparent 100%); }
+.sec{ position:absolute; inset:0; will-change:transform; }
+
+/* 0 · INICIO */
+.checker{ position:absolute; left:30px; top:250px; width:270px; text-align:center; }
+.checker .lbl{ font-size:26px; margin-bottom:12px; }
+.checker .row{ display:flex; align-items:center; justify-content:center; gap:14px; }
+.checker .yr{ font-size:24px; }
+.checker canvas{ width:190px; height:190px; display:block; image-rendering:pixelated; }
+.checker .sub{ margin-top:14px; font-size:24px; line-height:.95; }
+.echo{ position:absolute; left:50%; top:420px; width:740px; height:740px; transform:translate(-50%,-50%); }
+.echo svg{ position:absolute; inset:0; width:100%; height:100%; overflow:visible; }
+.stack{ position:absolute; right:30px; top:230px; width:330px; }
+.stack div{ position:relative; font-size:150px; line-height:.8; letter-spacing:-.03em; text-align:right; }
+.stack div i{ position:absolute; right:10px; bottom:14px; font-style:normal; font-size:22px; letter-spacing:.01em;
+  text-shadow:0 0 3px var(--bg),0 0 6px var(--bg),0 0 9px var(--bg),0 0 12px var(--bg); }
+.stack sup{ font-size:22px; vertical-align:top; }
+.hint{ position:absolute; left:50%; bottom:40px; transform:translateX(-50%); font-size:18px; padding:6px 14px 4px; }
+
+/* 1 · SERVICIOS */
+.svcBig{ position:absolute; left:30px; top:40px; font-size:176px; line-height:.82; letter-spacing:-.035em; }
+.svcBig sup{ font-size:.32em; vertical-align:top; }
+.mix{ position:absolute; left:34px; top:600px; width:860px; font-size:50px; line-height:1; letter-spacing:-.02em; }
+.mix small{ font-size:19px; letter-spacing:0; margin:0 .25em; vertical-align:.1em; }
+.fig{ position:absolute; right:30px; top:60px; width:470px; }
+.fig .box{ position:relative; height:600px; }
+.fig canvas{ position:absolute; inset:14px; width:calc(100% - 28px); height:calc(100% - 28px); }
+.fig .yr{ position:absolute; top:-30px; font-size:22px; }
+.fig .cap{ display:flex; justify-content:space-between; margin-top:10px; }
+
+/* 2 · PROYECTOS */
+.list{ position:absolute; left:30px; top:30px; width:900px; }
+.prow{ display:flex; align-items:baseline; gap:18px; padding:6px 12px 0; border-bottom:2.5px solid var(--red); cursor:pointer; text-decoration:none; color:inherit; height:88px; }
+.prow:first-child{ border-top:2.5px solid var(--red); }
+.prow .n{ font-size:16px; width:30px; }
+.prow .t{ font-size:78px; line-height:1; letter-spacing:-.03em; flex:1; }
+.prow .go{ font-size:14px; opacity:0; }
+.prow:hover{ background:var(--red); color:var(--bg); }
+.prow:hover .go{ opacity:1; }
+.prev{ position:absolute; right:30px; top:30px; width:470px; height:796px; }
+.prev canvas{ position:absolute; inset:14px; width:calc(100% - 28px); height:calc(100% - 28px); }
+.prev .cap{ position:absolute; left:0; right:0; bottom:-26px; display:flex; justify-content:space-between; }
+
+/* 3 · CONTACTO */
+.hola{ position:absolute; left:30px; top:40px; font-size:200px; line-height:.8; letter-spacing:-.04em; }
+.hola sup{ font-size:.2em; vertical-align:top; }
+.hola .ast{ font-size:.5em; vertical-align:top; }
+.ig{ position:absolute; left:34px; top:300px; font-size:64px; padding:10px 22px 4px; color:var(--red); text-decoration:none; letter-spacing:-.02em; }
+.ig:hover{ background:var(--red); color:var(--bg); }
+.form{ position:absolute; right:30px; top:300px; width:520px; display:flex; flex-direction:column; gap:14px; }
+.form label{ display:block; }
+.form input,.form textarea{ width:100%; background:none; border:2.5px solid var(--red); color:var(--red); font-family:"Heavy"; font-size:26px; padding:14px 14px 10px; outline:none; resize:none; text-transform:uppercase; }
+.form input::placeholder,.form textarea::placeholder{ color:var(--red); opacity:.55; }
+.form button{ background:var(--red); color:var(--bg); border:none; font-family:"Heavy"; font-size:34px; padding:12px 0 8px; cursor:pointer; text-transform:uppercase; }
+.pix{ position:absolute; left:30px; bottom:30px; width:384px; height:192px; image-rendering:pixelated; }
+.foot{ position:absolute; left:440px; bottom:34px; width:520px; }
+
+/* textura: grano + viñeta */
+.grain{ position:fixed; inset:-50%; pointer-events:none; opacity:.13; mix-blend-mode:screen; animation:grain .5s steps(4) infinite;
+  background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='300'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>"); }
+@keyframes grain{ 0%{transform:translate(0,0)} 25%{transform:translate(-3%,2%)} 50%{transform:translate(2%,-3%)} 75%{transform:translate(-1%,3%)} }
+.vig{ position:fixed; inset:0; pointer-events:none; background:radial-gradient(ellipse at 50% 50%,transparent 60%,rgba(0,0,0,.55) 100%); }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+        <g id="pana-word">
+          <path  d="M45.26,172.65l13.58-63.86h13.76l-3.22,14.65-2.23,8.66-.54,11.88-5.9,28.67h-15.45ZM73.93,156.22c-3.22,0-5.54-1.06-6.97-3.17-1.43-2.11-2.14-5.17-2.14-9.16s.59-8.78,1.79-14.38c1.07-5,2.34-9.12,3.8-12.37,1.46-3.24,3.1-5.61,4.91-7.1,1.82-1.49,3.71-2.23,5.67-2.23,2.44,0,4.41.6,5.9,1.79,1.49,1.19,2.56,2.95,3.22,5.27.65,2.32.94,5.09.85,8.31-.09,3.22-.55,6.82-1.38,10.81-.95,4.88-2.16,8.95-3.62,12.19-1.46,3.25-3.2,5.73-5.23,7.46-2.03,1.73-4.29,2.59-6.79,2.59ZM69.37,144.97c.71,0,1.35-.45,1.92-1.34.56-.89,1.1-2.26,1.61-4.11.51-1.84,1.06-4.17,1.65-6.97.71-3.27,1.16-5.85,1.34-7.73.18-1.88.12-3.17-.18-3.88-.3-.71-.83-1.07-1.61-1.07-.66,0-1.24.33-1.74.98-.51.66-1.03,1.85-1.56,3.57-.54,1.73-1.19,4.17-1.97,7.32-.54,2.74-.92,4.99-1.16,6.74-.24,1.76-.3,3.11-.18,4.06.12.95.36,1.59.71,1.92.36.33.74.49,1.16.49Z"/>
+          <path  d="M100.55,156.22c-2.26,0-4.15-.6-5.67-1.79s-2.62-2.95-3.31-5.27c-.69-2.32-.98-5.09-.89-8.31.09-3.21.55-6.91,1.38-11.08,1.01-4.76,2.25-8.77,3.71-12.01,1.46-3.25,3.2-5.72,5.23-7.41,2.02-1.7,4.29-2.55,6.79-2.55,2.32,0,4.18.58,5.58,1.74,1.4,1.16,2.37,2.86,2.9,5.09.54,2.23.71,4.97.54,8.22-.18,3.25-.75,6.95-1.7,11.12-1.07,5.3-2.37,9.57-3.89,12.82-1.52,3.25-3.14,5.63-4.87,7.15-1.73,1.52-3.66,2.28-5.81,2.28ZM107.51,145.05c.59,0,1.15-.36,1.65-1.07.51-.71,1.06-2,1.65-3.84.59-1.85,1.25-4.5,1.96-7.95.54-2.62.91-4.75,1.12-6.39.21-1.64.28-2.89.22-3.75-.06-.86-.27-1.47-.63-1.83-.36-.36-.83-.54-1.43-.54-.66,0-1.25.45-1.79,1.34-.54.89-1.04,2.2-1.52,3.93-.48,1.73-1.01,3.9-1.61,6.52-.77,3.45-1.25,6.18-1.43,8.17-.18,2-.12,3.39.18,4.2.3.8.83,1.21,1.61,1.21ZM108.41,155.24l2.86-12.86,2.77-9.91,1.43-10.09,2.95-13.58h14.11l-9.91,46.45h-14.2Z"/>
+          <path  d="M126.36,155.24l9.83-46.45h13.31l-4.2,20.36-.98-.54c1.01-4.7,2.29-8.6,3.84-11.7,1.55-3.1,3.29-5.39,5.23-6.88,1.93-1.49,4.03-2.23,6.3-2.23,1.91,0,3.51.4,4.82,1.21,1.31.8,2.32,1.96,3.04,3.48.71,1.52,1.1,3.39,1.16,5.63.06,2.23-.21,4.84-.8,7.82l-6.25,29.3h-15.45l6.43-30.1c.18-.83.3-1.55.36-2.14.06-.59.04-1.1-.04-1.52-.09-.42-.25-.73-.49-.94-.24-.21-.54-.31-.89-.31-.6,0-1.13.31-1.61.94-.48.63-.94,1.56-1.38,2.81-.45,1.25-.94,2.95-1.47,5.09l-5.45,26.17h-15.27Z"/>
+          <path  d="M177.9,156.22c-2.26,0-4.15-.6-5.67-1.79s-2.62-2.95-3.31-5.27c-.68-2.32-.98-5.09-.89-8.31.09-3.21.55-6.91,1.38-11.08,1.01-4.76,2.25-8.77,3.71-12.01,1.46-3.25,3.2-5.72,5.23-7.41,2.02-1.7,4.29-2.55,6.79-2.55,2.32,0,4.18.58,5.58,1.74,1.4,1.16,2.37,2.86,2.9,5.09.54,2.23.71,4.97.54,8.22-.18,3.25-.75,6.95-1.7,11.12-1.07,5.3-2.37,9.57-3.88,12.82-1.52,3.25-3.14,5.63-4.87,7.15-1.73,1.52-3.66,2.28-5.81,2.28ZM184.86,145.05c.59,0,1.15-.36,1.65-1.07.5-.71,1.06-2,1.65-3.84.59-1.85,1.25-4.5,1.96-7.95.54-2.62.91-4.75,1.12-6.39.21-1.64.28-2.89.22-3.75-.06-.86-.27-1.47-.62-1.83s-.83-.54-1.43-.54c-.66,0-1.25.45-1.79,1.34-.54.89-1.04,2.2-1.52,3.93-.48,1.73-1.01,3.9-1.61,6.52-.77,3.45-1.25,6.18-1.43,8.17-.18,2-.12,3.39.18,4.2s.83,1.21,1.61,1.21ZM185.76,155.24l2.86-12.86,2.77-9.91,1.43-10.09,2.95-13.58h14.11l-9.92,46.45h-14.2Z"/>
+        </g>
+
+<g id="pana-oval"><ellipse cx="131.08" cy="131.08" rx="88.3" ry="45.01" transform="translate(-8.75 9.37) rotate(-3.96)" fill="none"/></g>
+<path id="badgePath" d="M63,63 m-48,0 a48,48 0 1,1 96,0 a48,48 0 1,1 -96,0"/>
+</defs></svg>
+
+<div class="viewport"><main class="stage" id="stage">
+
+  <!-- marco fijo -->
+  <header class="top">
+    <div class="brand">ESTUDIO PANA<sup>®</sup></div>
+    <nav class="nav" id="nav">
+      <button data-s="0">Inicio</button><button data-s="1">Servicios</button><button data-s="2">Proyectos</button><button data-s="3">Contacto</button>
+    </nav>
+  </header>
+
+  <div class="colL"><div class="frame box"></div>
+    <div class="big" style="margin-top:-75px">ESTUDIO CREATIVO.®</div>
+    <div class="tag micro"><span>ESTUDIO PANA · MDP</span></div>
+  </div>
+  <div class="colL2"><div class="v">BRANDING, AUDIOVISUAL<small>&amp; SOCIAL MEDIA</small></div></div>
+
+  <div class="colR"><div class="v">BRANDING, AUDIOVISUAL<br>&amp; SOCIAL MEDIA ®</div></div>
+  <svg class="badge" viewBox="0 0 126 126" aria-hidden="true">
+    <text font-family="Heavy" font-size="12.5" fill="#f50000" letter-spacing="1.2"><textPath href="#badgePath">ESTUDIO PANA · MAR DEL PLATA · ESTUDIO CREATIVO ·</textPath></text>
+    <svg x="33" y="33" width="60" height="60" viewBox="40 80 182 102"><use href="#pana-oval" stroke="#f50000" stroke-width="5"/><use href="#pana-word" fill="#f50000"/></svg>
+  </svg>
+
+  <footer class="bottom">
+    <div class="micro">ESTUDIO PANA®<br>MAR DEL PLATA, ARG.</div>
+    <div class="micro r">38°00′S · 57°33′W<br>@ESTUDIO.PANA</div>
+    <div class="micro r">BRANDING · AUDIOVISUAL<br>SOCIAL MEDIA · 2026</div>
+    <div class="micro r">TODOS LOS PROYECTOS<br>EN BEHANCE ↗</div>
+    <div class="counter" id="counter">01/04 — INICIO</div>
+  </footer>
+
+  <div class="win" id="win">
+
+    <!-- 0 · INICIO -->
+    <section class="sec" data-i="0">
+      <div class="checker">
+        <div class="lbl">ESTO ES PANA</div>
+        <div class="row"><span class="yr">20</span><canvas id="chk" width="5" height="5"></canvas><span class="yr">26</span></div>
+        <div class="sub">ESTUDIO<br>CREATIVO. ®</div>
+      </div>
+      <div class="echo" id="echo"><svg viewBox="0 0 262.16 262.16" id="echoSvg"></svg></div>
+      <div class="stack">
+        <div>PANA<sup>™</sup><i>ESTUDIO CREATIVO</i></div>
+        <div>PANA<sup>™</sup><i>ESTUDIO CREATIVO</i></div>
+        <div>PANA<sup>™</sup><i>ESTUDIO CREATIVO</i></div>
+      </div>
+      <div class="hint box">↓ SCROLL</div>
+    </section>
+
+    <!-- 1 · SERVICIOS -->
+    <section class="sec" data-i="1">
+      <div class="svcBig">BRANDING<sup>®</sup><br>AUDIOVISUAL<br>SOCIAL MEDIA.</div>
+      <div class="mix">IDENTIDAD<small>logos</small>SISTEMAS<small>de marca</small>PACKAGING <small>menús</small>CARTELERÍA<small>catálogos</small>
+        FOTOGRAFÍA<small>video</small>REELS<small>spots</small>CONTENIDO<small>grillas</small>PLACAS <small>webs</small>COMUNIDAD</div>
+      <div class="fig">
+        <div class="box"><span class="yr" style="left:0">20</span><span class="yr" style="right:0">26</span><canvas id="figCv" width="442" height="572"></canvas></div>
+        <div class="cap"><span class="micro" id="figCap">FIG. 01 — PESQUERA CO</span><span class="micro r">TRABAJOS RECIENTES</span></div>
+      </div>
+    </section>
+
+    <!-- 2 · PROYECTOS -->
+    <section class="sec" data-i="2">
+      <div class="list" id="list"></div>
+      <div class="prev box"><canvas id="prevCv" width="442" height="768"></canvas>
+        <div class="cap"><span class="micro" id="prevCap">FIG. 01 — PESQUERA CO</span><span class="micro r">BEHANCE ↗</span></div></div>
+    </section>
+
+    <!-- 3 · CONTACTO -->
+    <section class="sec" data-i="3">
+      <div class="hola"><span class="ast">*</span>HABLEMOS.<sup>®</sup></div>
+      <a class="ig box" href="https://www.instagram.com/estudio.pana/" target="_blank" rel="noopener">@ESTUDIO.PANA ↗</a>
+      <form class="form" onsubmit="event.preventDefault();this.querySelector('button').textContent='¡GRACIAS!'">
+        <div class="micro">1. TU EMAIL</div><input type="email" placeholder="TU EMAIL" required>
+        <div class="micro">2. TU CONSULTA</div><textarea rows="4" placeholder="CONTANOS QUÉ NECESITÁS" required></textarea>
+        <button type="submit">ENVIAR →</button>
+        <div class="micro r">PRUEBA VISUAL · EL FORMULARIO REAL ES EL DEL SITIO DE BRUNO.</div>
+      </form>
+      <canvas class="pix" id="pix" width="64" height="32"></canvas>
+      <div class="foot micro r">1. ESTUDIO PANA® — BRANDING, AUDIOVISUAL &amp; SOCIAL MEDIA.<br>MAR DEL PLATA, ARGENTINA. 38°00′S · 57°33′W · @ESTUDIO.PANA</div>
+    </section>
+
+  </div>
+</main></div>
+<div class="grain"></div><div class="vig"></div>
+
+<script>
+(function(){
+  var RED="#f50000", BG="#0b0b0b";
+  var stage=document.getElementById("stage");
+  function fit(){ stage.style.setProperty("--k",Math.min(innerWidth/1920,innerHeight/1080)); }
+  fit(); addEventListener("resize",fit);
+
+  /* ---------- proyectos (los mismos del sitio de Bruno) ---------- */
+  var BE="https://www.behance.net/gallery/";
+  var P=[["PESQUERA CO","pesquera-co.png","247209451/PESQUERA-CO"],["LOGOFOLIO V.2","logofolio-v2.jpg","247207229/LOGOFOLIO-V2"],
+    ["LOGOFOLIO V.1","logofolio-v1.jpg","247207111/LOGOFOLIO-V1"],["CANTINA BERNARDO","cantina-bernardo.png","237220743/CANTINA-BERNARDO"],
+    ["FURIAS","furias.png","247199731/FURIAS-WAREHOUSE"],["RAZA ARGENTINA","raza-argentina.jpg","236751421/Raza-Argentina"],
+    ["BODEGON CO","bodegon-co.png","236718073/BODEGON-CO-Restaurant-Branding"],["VIALMAQ","vialmaq.jpg","229347939/VIALMAQ"],
+    ["PLANTA BAJA","planta-baja.jpg","182014105/Planta-Baja"]];
+  var IMG=P.map(function(p){ var i=new Image(); i.src="img/"+p[1]; return i; });
+
+  /* ---------- imagen en puntos (como la hamburguesa de la referencia) ---------- */
+  var tmp=document.createElement("canvas"), tctx=tmp.getContext("2d",{willReadFrequently:true});
+  function halftone(cv,img,cell,reveal){
+    var c=cv.getContext("2d"), W=cv.width, H=cv.height; c.fillStyle=BG; c.fillRect(0,0,W,H);
+    if(!img.complete||!img.naturalWidth) return;
+    var cols=Math.ceil(W/cell), rows=Math.ceil(H/cell); tmp.width=cols; tmp.height=rows;
+    var s=Math.max(cols/img.naturalWidth,rows/img.naturalHeight), w=img.naturalWidth*s, h=img.naturalHeight*s;
+    tctx.drawImage(img,(cols-w)/2,(rows-h)/2,w,h);
+    var d=tctx.getImageData(0,0,cols,rows).data, lo=1, hi=0; c.fillStyle=RED;
+    for(var j=0;j<d.length;j+=4){ var l=(d[j]*.3+d[j+1]*.59+d[j+2]*.11)/255; if(l<lo)lo=l; if(l>hi)hi=l; }
+    for(var y=0;y<rows;y++) for(var x=0;x<cols;x++){
+      if(reveal<1 && ((x*7+y*13)%17)/17>reveal) continue;
+      var k=(y*cols+x)*4, L=((d[k]*.3+d[k+1]*.59+d[k+2]*.11)/255-lo)/Math.max(.05,hi-lo), r=Math.pow(L,.8)*cell*.6;
+      if(r>.5){ c.beginPath(); c.arc(x*cell+cell/2,y*cell+cell/2,r,0,6.283); c.fill(); }
+    }
+  }
+
+  /* ---------- damero ---------- */
+  var ck=document.getElementById("chk").getContext("2d");
+  function checker(shift){ ck.fillStyle=BG; ck.fillRect(0,0,5,5); ck.fillStyle=RED;
+    for(var y=0;y<5;y++) for(var x=0;x<5;x++) if((x+y+shift)%2===0) ck.fillRect(x,y,1,1); }
+  checker(0);
+
+  /* ---------- logo con eco de contornos (la pila de "VICIO" en clave Pana) ---------- */
+  var NS="http://www.w3.org/2000/svg", es=document.getElementById("echoSvg"), copies=[];
+  for(var i=0;i<10;i++){
+    var g=document.createElementNS(NS,"g");
+    g.innerHTML='<use href="#pana-oval" stroke="'+RED+'" stroke-width="'+(i===9?3:.6)+'"/><use href="#pana-word" '+(i===9?'fill="'+RED+'"':'fill="'+BG+'" stroke="'+RED+'" stroke-width=".6"')+'/>';
+    es.appendChild(g); copies.push(g);
+  }
+  var emx=0, emy=0, tmx=0, tmy=0;
+  addEventListener("mousemove",function(e){ tmx=e.clientX/innerWidth-.5; tmy=e.clientY/innerHeight-.5; });
+
+  /* ---------- bloques de píxeles: el logo de pana a 36x18 ---------- */
+  var pv=document.getElementById("pix").getContext("2d");
+  function pixel(){
+    var s=new XMLSerializer().serializeToString(document.querySelector("defs"));
+    var svg='<svg xmlns="http://www.w3.org/2000/svg" viewBox="40 80 182 102" width="64" height="32"><defs>'+s.replace(/^<defs[^>]*>|<\/defs>$/g,"")+'</defs><use href="#pana-oval" stroke="red" stroke-width="5"/><use href="#pana-word" fill="red"/></svg>';
+    var im=new Image(); im.onload=function(){ pv.clearRect(0,0,64,32); pv.drawImage(im,0,0,64,32);
+      var d=pv.getImageData(0,0,64,32); for(var k=0;k<d.data.length;k+=4){ var on=d.data[k+3]>90; d.data[k]=245; d.data[k+1]=0; d.data[k+2]=0; d.data[k+3]=on?255:0; } pv.putImageData(d,0,0); };
+    im.src="data:image/svg+xml;charset=utf-8,"+encodeURIComponent(svg);
+  }
+  pixel();
+
+  /* ---------- lista de proyectos + vista en puntos ---------- */
+  var list=document.getElementById("list"), prevCv=document.getElementById("prevCv"), prevCap=document.getElementById("prevCap"), cur=0, rev=0;
+  P.forEach(function(p,i){
+    var a=document.createElement("a"); a.className="prow"; a.href=BE+p[2]; a.target="_blank"; a.rel="noopener";
+    a.innerHTML='<span class="n micro">'+String(i+1).padStart(2,"0")+'</span><span class="t">'+p[0]+'</span><span class="go micro">VER EN BEHANCE ↗</span>';
+    a.onmouseenter=function(){ cur=i; rev=0; prevCap.textContent="FIG. "+String(i+1).padStart(2,"0")+" — "+p[0]; };
+    list.appendChild(a);
+  });
+
+  /* ---------- figura de servicios: rota por los proyectos ---------- */
+  var figCv=document.getElementById("figCv"), figCap=document.getElementById("figCap"), fi=0, frev=0, flast=0;
+
+  /* ---------- navegación por secciones ---------- */
+  var secs=[].slice.call(document.querySelectorAll(".sec")), navB=[].slice.call(document.querySelectorAll("#nav button"));
+  var NAMES=["INICIO","SERVICIOS","PROYECTOS","CONTACTO"], target=0, p=0, lock=0, vel=0;
+  function go(s){ target=Math.max(0,Math.min(3,s)); }
+  navB.forEach(function(b){ b.onclick=function(){ go(+b.dataset.s); }; });
+  addEventListener("wheel",function(e){ e.preventDefault(); var t=performance.now(); if(t<lock||Math.abs(e.deltaY)<4) return; go(target+(e.deltaY>0?1:-1)); lock=t+750; },{passive:false});
+  addEventListener("keydown",function(e){ if(/INPUT|TEXTAREA/.test(e.target.tagName)) return;
+    if(e.key==="ArrowDown"||e.key===" "||e.key==="PageDown"){ e.preventDefault(); go(target+1); }
+    if(e.key==="ArrowUp"||e.key==="PageUp"){ e.preventDefault(); go(target-1); } });
+  var q=new URLSearchParams(location.search).get("s"); if(q){ target=p=+q; }
+
+  var t0=performance.now(), ckT=0;
+  function frame(t){
+    var np=p+(target-p)*.085; if(Math.abs(target-np)<.0005) np=target; vel=np-p; p=np;
+    secs.forEach(function(s,i){ s.style.transform="translateY("+((i-p)*900)+"px)"; s.style.visibility=Math.abs(i-p)<1.02?"visible":"hidden"; });
+    var si=Math.round(p);
+    navB.forEach(function(b,i){ b.classList.toggle("on",i===si); });
+    document.getElementById("counter").textContent=String(si+1).padStart(2,"0")+"/04 — "+NAMES[si];
+
+    // eco: la pila de contornos se estira hacia el lado opuesto al mouse, y más con la velocidad del scroll
+    emx+=(tmx-emx)*.07; emy+=(tmy-emy)*.07;
+    var spread=1+Math.min(6,Math.abs(vel)*260), dx=-emx*5*spread, dy=(2.2-emy*4)*spread;
+    copies.forEach(function(g,i){ var k=9-i; g.setAttribute("transform","translate("+(dx*k*1.1)+" "+(dy*k*1.1)+")"); });
+
+    // damero que titila cada tanto (como un cartel de feria)
+    if(t-ckT>900){ ckT=t; checker(Math.floor(t/900)%2); }
+
+    // figuras en puntos
+    if(Math.abs(p-1)<1){ if(t-flast>2600){ flast=t; fi=(fi+1)%P.length; frev=0; figCap.textContent="FIG. "+String(fi+1).padStart(2,"0")+" — "+P[fi][0]; }
+      if(frev<1){ frev=Math.min(1,frev+.06); halftone(figCv,IMG[fi],11,frev); } }
+    if(cur>=0 && rev<1){ rev=Math.min(1,rev+.09); halftone(prevCv,IMG[cur],10,rev); }
+    requestAnimationFrame(frame);
+  }
+  IMG[0].onload=function(){ halftone(figCv,IMG[0],11,1); };
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

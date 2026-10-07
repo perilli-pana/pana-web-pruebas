@@ -1,0 +1,7 @@
+Variaciones del logo de Pana (3-oct-2026)
+Presentación online: https://claude.ai/artifact/TCLcNVsZthoCSQzz3wuhqm
+
+placas/tanda-1.jpg y tanda-2.jpg = todas las placas en una tira larga (para mirar sin internet)
+preview.html / preview2.html = las mismas placas, abrir con Chrome
+gen.py (variaciones), gen2.py (neón + stickers), gen3.py (logo original + aplicaciones, va primero). Correr: python3 gen3.py (arma todo)
+deck/ = los archivos que se suben a la presentación

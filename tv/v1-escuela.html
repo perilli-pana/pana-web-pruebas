@@ -1,0 +1,396 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Video Pana</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=VT323&family=Caveat:wght@600&display=swap" rel="stylesheet">
+<style>
+@font-face{font-family:Grot;src:url(PPRightGrotesk-CompactBlack.woff2)}
+:root{--red:#f50000;--k:1}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;overflow:hidden;background:#0b0807;cursor:default}
+body{font-family:Grot,Impact,sans-serif;color:#eee}
+
+/* el cuarto: lienzo 1600x1000 escalado, centrado */
+#room{position:fixed;left:50%;top:50%;width:1600px;height:1000px;
+  transform:translate(-50%,-50%) scale(var(--k));transform-origin:50% 50%}
+#cam{position:absolute;inset:0;transition:transform .6s cubic-bezier(.2,.7,.2,1)}
+
+/* ---------- pared ---------- */
+#wall{position:absolute;left:-1400px;right:-1400px;top:-900px;bottom:-300px;
+  background:
+   linear-gradient(180deg,rgba(0,0,0,.55),transparent 30%,transparent 70%,rgba(0,0,0,.6)),
+   repeating-linear-gradient(90deg,#2a2320 0 2px,#221c19 2px 120px),
+   #221c19}
+.rack{position:absolute;display:grid;gap:10px 8px;padding:10px 10px 0}
+.shelf{position:absolute;height:14px;background:linear-gradient(#5a4a3e,#2e241d);box-shadow:0 8px 14px rgba(0,0,0,.6)}
+.cat{position:absolute;font-size:30px;letter-spacing:.02em;color:#111;background:#f2c230;padding:6px 14px 2px;transform:rotate(-1.5deg);
+  box-shadow:0 4px 0 rgba(0,0,0,.35)}
+.cat.r{background:#e8e2d4} .cat.b{background:#3b6fd8;color:#fff} .cat.g{background:#3aa65a;color:#fff} .cat.p{background:#d63e8a;color:#fff}
+.vhs{width:78px;height:112px;position:relative;overflow:hidden;border-radius:2px;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.08),0 3px 6px rgba(0,0,0,.6)}
+.vhs .t{position:absolute;left:5px;right:5px;font-size:13px;line-height:.92;text-transform:uppercase;letter-spacing:-.01em}
+.vhs .s{position:absolute;right:-4px;top:6px;width:30px;height:30px;border-radius:50%;background:#ffe600;color:#c00;
+  font-size:8px;display:flex;align-items:center;justify-content:center;transform:rotate(14deg);text-align:center;line-height:.9}
+.vhs .p{position:absolute;left:4px;bottom:4px;background:#fff;color:#c00;font-family:VT323,monospace;font-size:13px;padding:0 3px}
+.vhs::after{content:"";position:absolute;inset:0;background:linear-gradient(110deg,rgba(255,255,255,.14),transparent 40%)}
+
+/* neón */
+#neon{position:absolute;left:24px;top:150px;width:250px;height:250px;border-radius:14px;background:radial-gradient(ellipse at 50% 55%,#1a0806,#070404);box-shadow:0 14px 30px rgba(0,0,0,.7),inset 0 0 0 2px #2a2a2a}
+#neon::before,#neon::after{content:"";position:absolute;top:-170px;width:2px;height:170px;background:repeating-linear-gradient(#888 0 4px,#333 4px 7px)}
+#neon::before{left:40px}#neon::after{right:40px}
+#neon svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+#neon .tube{fill:none;stroke:#ff6a58;stroke-width:2.2;stroke-linejoin:round;
+  filter:drop-shadow(0 0 2px #ff2a10) drop-shadow(0 0 6px #ff1a00) drop-shadow(0 0 16px #f50000)}
+#neon .video{position:absolute;left:0;right:0;top:44px;text-align:center;font:600 46px Caveat,cursive;color:#ffd9d2;
+  text-shadow:0 0 4px #ff3a20,0 0 12px #ff1a00,0 0 28px #f50000;transform:rotate(-6deg)}
+#neon.flick{animation:nf 7s infinite}
+@keyframes nf{0%,91%,93.5%,96%,100%{opacity:1}92%,95%{opacity:.25}}
+#neonglow{position:absolute;left:-150px;top:0;width:600px;height:560px;
+  background:radial-gradient(closest-side,rgba(255,40,20,.22),transparent);mix-blend-mode:screen;pointer-events:none}
+#abierto{position:absolute;right:50px;top:300px;background:#060a07;font:46px VT323,monospace;color:#7dffb0;padding:2px 14px;border:3px solid #7dffb0;border-radius:10px;
+  text-shadow:0 0 6px #2dff80,0 0 18px #00ff66;box-shadow:0 0 10px #00ff66,inset 0 0 10px #00ff66;transform:rotate(3deg);letter-spacing:.08em}
+
+/* tubo de luz del techo */
+#tube{position:absolute;left:-200px;right:-200px;top:-40px;height:14px;background:#fffbe8;border-radius:7px;
+  box-shadow:0 0 30px 10px rgba(255,248,220,.35),0 0 140px 60px rgba(255,240,200,.12)}
+#tube.flick{animation:tf 11s infinite}
+@keyframes tf{0%,80%,82%,84%,100%{opacity:1}81%,83%{opacity:.2}}
+
+/* ---------- mostrador ---------- */
+#counter{position:absolute;left:-1400px;right:-1400px;top:812px;height:900px}
+#counter .top{height:30px;background:linear-gradient(#b9a68f,#8a7763 60%,#5e4f40);box-shadow:0 -2px 0 #d8c8b2 inset}
+#counter .front{height:870px;background:
+  repeating-linear-gradient(90deg,rgba(0,0,0,.08) 0 1px,transparent 1px 7px),
+  linear-gradient(#c23a2a,#8e2318 30%,#4a120c)}
+.sticker{position:absolute;font-size:22px;padding:8px 14px 4px;color:#111;box-shadow:0 3px 8px rgba(0,0,0,.45)}
+
+/* objetos sobre el mostrador */
+#tapes{position:absolute;left:1270px;top:690px;width:200px}
+#tapes .tape{height:26px;margin-top:-2px;border-radius:2px;background:#151515;box-shadow:0 2px 4px rgba(0,0,0,.6);position:relative}
+#tapes .tape i{position:absolute;left:12px;right:60px;top:5px;bottom:5px;background:#e9e3d2;font:normal 12px/16px VT323,monospace;color:#333;padding-left:6px;font-style:normal}
+#card{position:absolute;left:170px;top:752px;width:170px;height:100px;background:linear-gradient(135deg,#f6efe0,#e2d6bd);border-radius:7px;
+  transform:rotate(-8deg) skewX(8deg);box-shadow:0 6px 12px rgba(0,0,0,.5);color:#1a1a1a;padding:10px 12px;overflow:hidden}
+#card b{display:block;font:normal 20px Grot;color:var(--red)}
+#card span{display:block;font:15px/1 VT323,monospace;margin-top:5px}
+#card .hand{font:600 22px Caveat,cursive;color:#1d3fa5;margin-top:2px}
+#card::before{content:"";position:absolute;right:-10px;top:-10px;width:60px;height:60px;border-radius:50%;border:5px solid var(--red);opacity:.85}
+#bell{position:absolute;left:1180px;top:760px;width:70px;height:56px}
+#bell::before{content:"";position:absolute;left:8px;right:8px;top:12px;bottom:6px;border-radius:40px 40px 4px 4px;background:radial-gradient(circle at 35% 30%,#fff,#bbb 30%,#666 80%)}
+#bell::after{content:"";position:absolute;left:0;right:0;bottom:0;height:8px;border-radius:3px;background:#333}
+
+/* ---------- VCR ---------- */
+#vcr{position:absolute;left:430px;top:762px;width:740px;height:52px;border-radius:4px;
+  background:linear-gradient(#3a3a3c,#202022 50%,#151516);box-shadow:0 6px 10px rgba(0,0,0,.6),inset 0 1px 0 #555}
+#vcr .slot{position:absolute;left:60px;top:14px;width:290px;height:22px;background:#0b0b0b;border-radius:2px;box-shadow:inset 0 2px 3px #000}
+#vcr .slot::after{content:"";position:absolute;left:4px;right:4px;top:3px;height:6px;background:#1c1c1c}
+#vcr .lcd{position:absolute;left:420px;top:10px;width:150px;height:30px;background:#071a10;border-radius:3px;
+  font:30px/30px VT323,monospace;color:#4dff9a;text-align:center;text-shadow:0 0 6px #1dff70;letter-spacing:.05em}
+#vcr .lcd.blink{animation:bl 1s steps(1) infinite}
+@keyframes bl{50%{opacity:.1}}
+#vcr .brand{position:absolute;left:600px;top:17px;font:12px VT323,monospace;color:#999;letter-spacing:.3em}
+
+/* ---------- la tele ---------- */
+#tv{position:absolute;left:300px;top:92px;width:1000px;height:672px;border-radius:36px 36px 28px 28px;
+  background:
+   linear-gradient(180deg,rgba(255,255,255,.07),transparent 20%),
+   repeating-linear-gradient(92deg,rgba(0,0,0,.08) 0 3px,transparent 3px 11px,rgba(255,220,180,.04) 11px 13px,transparent 13px 19px),
+   linear-gradient(90deg,#5b3a22,#6e4628 50%,#4f321d);
+  box-shadow:0 30px 40px rgba(0,0,0,.65),inset 0 0 0 3px rgba(0,0,0,.4),inset 0 2px 0 rgba(255,255,255,.15)}
+#tv .feet{position:absolute;bottom:-10px;width:80px;height:12px;background:#111;border-radius:0 0 6px 6px}
+#bezel{position:absolute;left:28px;top:26px;width:808px;height:620px;border-radius:30px;
+  background:linear-gradient(145deg,#2a2a2c,#121213);box-shadow:inset 0 0 0 2px #000,inset 0 3px 8px rgba(255,255,255,.08),0 1px 0 rgba(255,255,255,.12)}
+#screen{position:absolute;left:24px;top:25px;width:760px;height:570px;border-radius:44px/38px;overflow:hidden;background:#050505;
+  box-shadow:0 0 0 3px #050505,0 0 26px rgba(255,30,10,.25)}
+#screen.off{background:#0c0d0d}
+#site{position:absolute;left:-126.7px;top:0;width:1920px;height:1080px;border:0;transform:scale(.52778);transform-origin:0 0;background:#000}
+#fx{position:absolute;inset:0;pointer-events:none;border-radius:inherit}
+#fx > *{position:absolute;inset:0;pointer-events:none;border-radius:inherit}
+.scan{background:repeating-linear-gradient(to bottom,rgba(0,0,0,.28) 0 1px,transparent 1px 3px);mix-blend-mode:multiply}
+.mask{background:repeating-linear-gradient(to right,rgba(255,0,0,.06) 0 1px,rgba(0,255,0,.04) 1px 2px,rgba(0,0,255,.06) 2px 3px);mix-blend-mode:screen}
+.roll{background:linear-gradient(to bottom,transparent 0,rgba(255,255,255,.05) 45%,rgba(255,255,255,.09) 50%,transparent 58%);
+  height:220%;animation:roll 7s linear infinite}
+@keyframes roll{from{transform:translateY(-60%)}to{transform:translateY(10%)}}
+.vig{box-shadow:inset 0 0 90px 30px rgba(0,0,0,.85),inset 0 0 18px 6px rgba(0,0,0,.9)}
+.glass{background:
+  radial-gradient(ellipse 60% 40% at 30% 12%,rgba(255,255,255,.13),transparent 70%),
+  linear-gradient(120deg,rgba(255,255,255,.07),transparent 35%);mix-blend-mode:screen}
+.flicker{background:#fff;opacity:0;mix-blend-mode:overlay;animation:fl .12s steps(2) infinite}
+@keyframes fl{0%{opacity:.015}50%{opacity:.04}}
+#noise{opacity:0;transition:opacity .15s;width:100%;height:100%;image-rendering:pixelated}
+#noise.on{opacity:1}
+/* apagado / prendido */
+#power{background:#000;opacity:1;transition:none}
+#dot{position:absolute;left:50%;top:50%;width:100%;height:3px;background:#fff;box-shadow:0 0 30px 8px #fff;border-radius:3px;
+  transform:translate(-50%,-50%) scaleX(0);opacity:0;pointer-events:none}
+#osd{position:absolute;right:46px;top:34px;font:44px VT323,monospace;color:#4dff6e;text-shadow:0 0 6px #00ff40,2px 2px 0 #000;
+  opacity:0;pointer-events:none;letter-spacing:.06em;text-align:right}
+#osd .bar{display:block;font-size:30px;letter-spacing:0}
+
+/* panel de controles */
+#panel{position:absolute;left:856px;top:30px;width:118px;height:612px;border-radius:14px;
+  background:linear-gradient(90deg,#1c1c1d,#2e2e30 50%,#1b1b1c);box-shadow:inset 0 0 0 2px #000,inset 0 2px 0 rgba(255,255,255,.08)}
+.knob{position:absolute;left:19px;width:80px;height:80px;border-radius:50%;cursor:pointer;
+  background:radial-gradient(circle at 40% 35%,#6a6a6c,#2a2a2c 60%,#151516);
+  box-shadow:0 6px 10px rgba(0,0,0,.7),inset 0 2px 2px rgba(255,255,255,.2);transition:transform .25s cubic-bezier(.3,1.6,.5,1)}
+.knob::before{content:"";position:absolute;inset:9px;border-radius:50%;
+  background:repeating-conic-gradient(#3a3a3c 0 6deg,#262628 6deg 12deg);box-shadow:inset 0 0 6px #000}
+.knob::after{content:"";position:absolute;left:37px;top:6px;width:6px;height:24px;border-radius:3px;background:#e8e2d4}
+.lbl{position:absolute;left:0;right:0;text-align:center;font:17px VT323,monospace;color:#9a9a9a;letter-spacing:.15em}
+.nums{position:absolute;left:0;right:0;font:13px VT323,monospace;color:#777;text-align:center}
+#pwr{position:absolute;left:34px;top:470px;width:50px;height:34px;border-radius:5px;background:linear-gradient(#d8d2c4,#a39c8c);cursor:pointer;
+  box-shadow:0 4px 0 #555,0 6px 8px rgba(0,0,0,.6)}
+#pwr:active{transform:translateY(3px);box-shadow:0 1px 0 #555}
+#led{position:absolute;left:52px;top:528px;width:12px;height:12px;border-radius:50%;background:#400;box-shadow:inset 0 1px 2px #000}
+#led.on{background:#ff2a10;box-shadow:0 0 8px 2px #ff2a10}
+.grille{position:absolute;left:20px;right:20px;top:568px;height:30px;background:repeating-linear-gradient(to bottom,#0a0a0a 0 3px,#333 3px 6px);border-radius:3px}
+#ant{position:absolute;left:640px;top:-150px;width:220px;height:160px;pointer-events:none}
+#ant i{position:absolute;bottom:0;left:105px;width:4px;height:190px;background:linear-gradient(#ddd,#888);transform-origin:50% 100%;border-radius:2px}
+#ant i::before{content:"";position:absolute;top:-5px;left:-3px;width:10px;height:10px;border-radius:50%;background:#ccc}
+#ant b{position:absolute;bottom:-8px;left:70px;width:76px;height:26px;border-radius:40px 40px 6px 6px;background:radial-gradient(circle at 40% 30%,#555,#151515)}
+#tvbrand{position:absolute;left:40px;bottom:6px;font:normal 15px Grot;color:rgba(255,220,180,.55);letter-spacing:.3em}
+
+/* luz roja de la tele sobre el cuarto */
+#spill{position:absolute;left:-200px;top:-200px;width:2000px;height:1400px;pointer-events:none;mix-blend-mode:screen;
+  background:radial-gradient(ellipse 760px 520px at 1000px 600px,rgba(255,40,20,.16),transparent 70%);transition:opacity .4s}
+
+/* film: grano + viñeta sobre todo */
+#grain{position:fixed;inset:-50%;width:200%;height:200%;pointer-events:none;opacity:.16;mix-blend-mode:overlay;animation:gr .5s steps(4) infinite;
+  background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='300'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>")}
+@keyframes gr{0%{transform:translate(0,0)}25%{transform:translate(-3%,2%)}50%{transform:translate(2%,-3%)}75%{transform:translate(-1%,-2%)}}
+#vign{position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse 80% 80% at 50% 48%,transparent 50%,rgba(0,0,0,.7))}
+#hint{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);font:20px VT323,monospace;color:rgba(255,255,255,.5);letter-spacing:.12em;
+  pointer-events:none;transition:opacity 1s;white-space:nowrap}
+@media (prefers-reduced-motion:reduce){.roll,.flicker,#grain,#neon.flick,#tube.flick{animation:none}}
+</style>
+</head>
+<body>
+<div id="room"><div id="cam">
+  <div id="wall"></div>
+  <div id="tube" class="flick"></div>
+  <div id="racks"></div>
+
+  <div id="neonglow"></div>
+  <div id="neon" class="flick">
+    <div class="video">video</div>
+    <svg viewBox="0 -20 262.16 262.16"><g class="tube" transform="translate(0 30)"><ellipse cx="131.08" cy="131.08" rx="88.3" ry="45.01" transform="translate(-8.75 9.37) rotate(-3.96)" fill="none"/><path  d="M45.26,172.65l13.58-63.86h13.76l-3.22,14.65-2.23,8.66-.54,11.88-5.9,28.67h-15.45ZM73.93,156.22c-3.22,0-5.54-1.06-6.97-3.17-1.43-2.11-2.14-5.17-2.14-9.16s.59-8.78,1.79-14.38c1.07-5,2.34-9.12,3.8-12.37,1.46-3.24,3.1-5.61,4.91-7.1,1.82-1.49,3.71-2.23,5.67-2.23,2.44,0,4.41.6,5.9,1.79,1.49,1.19,2.56,2.95,3.22,5.27.65,2.32.94,5.09.85,8.31-.09,3.22-.55,6.82-1.38,10.81-.95,4.88-2.16,8.95-3.62,12.19-1.46,3.25-3.2,5.73-5.23,7.46-2.03,1.73-4.29,2.59-6.79,2.59ZM69.37,144.97c.71,0,1.35-.45,1.92-1.34.56-.89,1.1-2.26,1.61-4.11.51-1.84,1.06-4.17,1.65-6.97.71-3.27,1.16-5.85,1.34-7.73.18-1.88.12-3.17-.18-3.88-.3-.71-.83-1.07-1.61-1.07-.66,0-1.24.33-1.74.98-.51.66-1.03,1.85-1.56,3.57-.54,1.73-1.19,4.17-1.97,7.32-.54,2.74-.92,4.99-1.16,6.74-.24,1.76-.3,3.11-.18,4.06.12.95.36,1.59.71,1.92.36.33.74.49,1.16.49Z"/>
+          <path  d="M100.55,156.22c-2.26,0-4.15-.6-5.67-1.79s-2.62-2.95-3.31-5.27c-.69-2.32-.98-5.09-.89-8.31.09-3.21.55-6.91,1.38-11.08,1.01-4.76,2.25-8.77,3.71-12.01,1.46-3.25,3.2-5.72,5.23-7.41,2.02-1.7,4.29-2.55,6.79-2.55,2.32,0,4.18.58,5.58,1.74,1.4,1.16,2.37,2.86,2.9,5.09.54,2.23.71,4.97.54,8.22-.18,3.25-.75,6.95-1.7,11.12-1.07,5.3-2.37,9.57-3.89,12.82-1.52,3.25-3.14,5.63-4.87,7.15-1.73,1.52-3.66,2.28-5.81,2.28ZM107.51,145.05c.59,0,1.15-.36,1.65-1.07.51-.71,1.06-2,1.65-3.84.59-1.85,1.25-4.5,1.96-7.95.54-2.62.91-4.75,1.12-6.39.21-1.64.28-2.89.22-3.75-.06-.86-.27-1.47-.63-1.83-.36-.36-.83-.54-1.43-.54-.66,0-1.25.45-1.79,1.34-.54.89-1.04,2.2-1.52,3.93-.48,1.73-1.01,3.9-1.61,6.52-.77,3.45-1.25,6.18-1.43,8.17-.18,2-.12,3.39.18,4.2.3.8.83,1.21,1.61,1.21ZM108.41,155.24l2.86-12.86,2.77-9.91,1.43-10.09,2.95-13.58h14.11l-9.91,46.45h-14.2Z"/>
+          <path  d="M126.36,155.24l9.83-46.45h13.31l-4.2,20.36-.98-.54c1.01-4.7,2.29-8.6,3.84-11.7,1.55-3.1,3.29-5.39,5.23-6.88,1.93-1.49,4.03-2.23,6.3-2.23,1.91,0,3.51.4,4.82,1.21,1.31.8,2.32,1.96,3.04,3.48.71,1.52,1.1,3.39,1.16,5.63.06,2.23-.21,4.84-.8,7.82l-6.25,29.3h-15.45l6.43-30.1c.18-.83.3-1.55.36-2.14.06-.59.04-1.1-.04-1.52-.09-.42-.25-.73-.49-.94-.24-.21-.54-.31-.89-.31-.6,0-1.13.31-1.61.94-.48.63-.94,1.56-1.38,2.81-.45,1.25-.94,2.95-1.47,5.09l-5.45,26.17h-15.27Z"/>
+          <path  d="M177.9,156.22c-2.26,0-4.15-.6-5.67-1.79s-2.62-2.95-3.31-5.27c-.68-2.32-.98-5.09-.89-8.31.09-3.21.55-6.91,1.38-11.08,1.01-4.76,2.25-8.77,3.71-12.01,1.46-3.25,3.2-5.72,5.23-7.41,2.02-1.7,4.29-2.55,6.79-2.55,2.32,0,4.18.58,5.58,1.74,1.4,1.16,2.37,2.86,2.9,5.09.54,2.23.71,4.97.54,8.22-.18,3.25-.75,6.95-1.7,11.12-1.07,5.3-2.37,9.57-3.88,12.82-1.52,3.25-3.14,5.63-4.87,7.15-1.73,1.52-3.66,2.28-5.81,2.28ZM184.86,145.05c.59,0,1.15-.36,1.65-1.07.5-.71,1.06-2,1.65-3.84.59-1.85,1.25-4.5,1.96-7.95.54-2.62.91-4.75,1.12-6.39.21-1.64.28-2.89.22-3.75-.06-.86-.27-1.47-.62-1.83s-.83-.54-1.43-.54c-.66,0-1.25.45-1.79,1.34-.54.89-1.04,2.2-1.52,3.93-.48,1.73-1.01,3.9-1.61,6.52-.77,3.45-1.25,6.18-1.43,8.17-.18,2-.12,3.39.18,4.2s.83,1.21,1.61,1.21ZM185.76,155.24l2.86-12.86,2.77-9.91,1.43-10.09,2.95-13.58h14.11l-9.92,46.45h-14.2Z"/></g></svg>
+  </div>
+  <div id="abierto">ABIERTO</div>
+
+  <div id="counter"><div class="top"></div><div class="front"></div></div>
+  <div class="sticker" style="left:150px;top:880px;background:#ffe600;transform:rotate(-4deg)">SEA AMABLE · REBOBINE</div>
+  <div class="sticker" style="left:1240px;top:900px;background:#fff;transform:rotate(3deg)">MARTES 2×1 EN ESTRENOS</div>
+  <div class="sticker" style="left:620px;top:905px;background:#111;color:#f2c230;transform:rotate(-1deg);font-size:18px">DEVOLUCIÓN ANTES DE LAS 20 HS</div>
+
+  <div id="card"><b>VIDEO PANA</b><span>SOCIO Nº 0001</span><div class="hand">Marcos</div><span>VITALICIO · SIN CARGO</span></div>
+  <div id="tapes"></div>
+  <div id="bell"></div>
+
+  <div id="vcr"><div class="slot"></div><div class="lcd blink" id="lcd">12:00</div><div class="brand">HQ · VHS</div></div>
+
+  <div id="tv">
+    <div id="ant"><i style="transform:rotate(-28deg)"></i><i style="transform:rotate(22deg)"></i><b></b></div>
+    <div class="feet" style="left:90px"></div><div class="feet" style="right:90px"></div>
+    <div id="bezel">
+      <div id="screen" class="off">
+        <iframe id="site" src="../index.html?fx=mobius#1" allow="autoplay" title="Estudio Pana"></iframe>
+        <div id="fx">
+          <canvas id="noise" width="190" height="143"></canvas>
+          <div class="mask"></div><div class="scan"></div><div class="roll"></div><div class="flicker"></div>
+          <div class="vig"></div><div class="glass"></div>
+          <div id="power"></div>
+        </div>
+        <div id="dot"></div>
+        <div id="osd"></div>
+      </div>
+    </div>
+    <div id="panel">
+      <div class="lbl" style="top:22px">CANAL</div>
+      <div class="knob" id="ch" style="top:52px" title="Cambiar de canal"></div>
+      <div class="nums" style="top:138px">2 · 3 · 4 · 5</div>
+      <div class="lbl" style="top:198px">VOLUMEN</div>
+      <div class="knob" id="vol" style="top:228px;transform:rotate(-120deg)" title="Volumen"></div>
+      <div class="nums" style="top:314px">− · · · · +</div>
+      <div class="lbl" style="top:440px">POWER</div>
+      <div id="pwr" title="Prender / apagar"></div>
+      <div id="led"></div>
+      <div class="grille"></div>
+    </div>
+    <div id="tvbrand">PANAVISIÓN</div>
+  </div>
+
+  <div id="spill"></div>
+</div></div>
+<div id="grain"></div><div id="vign"></div>
+<div id="hint">scrolleá · perillas: canal y volumen</div>
+
+<script>
+(function(){
+  /* ---------- encuadre ---------- */
+  var room=document.getElementById("room");
+  function fit(){
+    var w=innerWidth,h=innerHeight;
+    var cover=Math.max(w/1600,h/1000);
+    var k=Math.min(cover, w/1100, h/820);       // la tele siempre entra entera
+    room.style.setProperty("--k",k);
+  }
+  addEventListener("resize",fit); fit();
+
+  /* ---------- estanterías: tapas inventadas, siempre las mismas (semilla fija) ---------- */
+  var seed=7; function rnd(){ seed=(seed*16807)%2147483647; return (seed-1)/2147483646; }
+  function pick(a){ return a[Math.floor(rnd()*a.length)]; }
+  var TIT=["La noche del ñandú","Persecución en la Rambla","Comando rebobinado","El último verano","Robot sudaca","Terror en el puerto",
+    "Los lobos del muelle","Karate de barrio","Planeta alfajor","Dos tipos y un Fitito","La casa del fondo","Invasión 2000","Corazón de neón",
+    "Cinta maldita","Policía de juguete","Galaxia Pana","Matiné","Puños de arena","La bruja del videoclub","Tormenta roja","Medianoche en Güemes",
+    "Faro asesino","Surf o muerte","El tío del videoclub","Rebobinar el tiempo","Ciber Ninja III","Los chicos de la cuadra","Vampiros de Playa Grande",
+    "Tiburón de Punta Mogotes","Misión: domingo","El secreto del ropero","Dinosaurios en la ruta 2","Amor en VHS","Turbo","Fuga del colegio",
+    "La lancha amarilla","Agente 0223","Pesadilla en la calle Alem","Mundial 86","Cometa","La bestia del Torreón","Patín y vapor"];
+  var PAL=[["#111","#f50000"],["#0b2a6b","#ffd200"],["#f2c230","#111"],["#e8e2d4","#c40000"],["#1d1d1d","#7dffb0"],["#d63e8a","#fff"],
+    ["#3aa65a","#fff"],["#ff6a1a","#111"],["#2b2b6e","#ff4fd8"],["#f4f0e6","#0b2a6b"],["#7a0f0f","#ffd7c2"],["#222","#ffe600"]];
+  function art(bg,fg){
+    var t=Math.floor(rnd()*5);
+    if(t===0) return "radial-gradient(circle at 50% 62%,"+fg+" 0 18%,transparent 19%),linear-gradient(180deg,"+bg+" 55%,#000)";
+    if(t===1) return "repeating-linear-gradient(0deg,"+fg+" 0 4px,"+bg+" 4px 9px) 0 70px/100% 40px no-repeat,"+bg;
+    if(t===2) return "linear-gradient(160deg,"+bg+" 40%,"+fg+" 40.5% 48%,"+bg+" 48.5%)";
+    if(t===3) return "radial-gradient(ellipse at 50% 120%,"+fg+",transparent 60%),"+bg;
+    return "conic-gradient(from 200deg at 50% 70%,"+bg+","+fg+" 20%,"+bg+" 35%)";
+  }
+  function cover(){
+    var c=pick(PAL), d=document.createElement("div"); d.className="vhs";
+    d.style.background=art(c[0],c[1]);
+    var t=document.createElement("div"); t.className="t"; t.textContent=pick(TIT); t.style.color=c[1];
+    t.style[rnd()<.5?"top":"bottom"]=(rnd()<.5?6:24)+"px"; if(rnd()<.3) t.style.fontSize="16px";
+    if(t.style.color===c[0]) t.style.color="#fff";
+    d.appendChild(t);
+    if(rnd()<.18){ var s=document.createElement("div"); s.className="s"; s.textContent="ESTRE­NO"; d.appendChild(s); }
+    if(rnd()<.25){ var p=document.createElement("div"); p.className="p"; p.textContent="$"+pick([2,3,3,5]); d.appendChild(p); }
+    return d;
+  }
+  var racks=document.getElementById("racks");
+  var CATS=[["ESTRENOS",""],["TERROR","r"],["ACCIÓN",""],["CIENCIA FICCIÓN","b"],["COMEDIA","g"],["INFANTILES","p"],["DRAMA","r"],["CLÁSICOS",""],["CONSOLAS","b"],["SURF","g"]];
+  // columnas de estantería a lo ancho (incluye lo que queda detrás de la tele y fuera de cuadro)
+  var ci=0;
+  for(var x=-1300;x<2900;x+=440){
+    var cols=4, rows=5, top=210, rowH=128;
+    var r=document.createElement("div"); r.className="rack";
+    r.style.cssText="left:"+x+"px;top:"+top+"px;grid-template-columns:repeat("+cols+",78px)";
+    for(var i=0;i<cols*rows;i++) r.appendChild(cover());
+    racks.appendChild(r);
+    for(var j=1;j<=rows;j++){
+      var sh=document.createElement("div"); sh.className="shelf";
+      sh.style.cssText="left:"+(x-6)+"px;width:"+(cols*86+24)+"px;top:"+(top+j*rowH-4)+"px"; racks.appendChild(sh);
+    }
+    var cat=CATS[ci++%CATS.length], cs=document.createElement("div");
+    cs.className="cat "+cat[1]; cs.textContent=cat[0]; cs.style.left=(x+10)+"px"; cs.style.top=(top-56)+"px"; racks.appendChild(cs);
+  }
+  // pila de cintas devueltas
+  var tapes=document.getElementById("tapes"), back=["Devuelta","Rebobinada","No rebobinó","Socio 0001","Devuelta"];
+  back.forEach(function(b,i){ var t=document.createElement("div"); t.className="tape"; t.style.transform="translateX("+((i%2?8:-6))+"px) rotate("+(i%2?1.5:-1)+"deg)";
+    t.innerHTML="<i>"+b+"</i>"; tapes.appendChild(t); });
+
+  /* ---------- la tele ---------- */
+  var screen=document.getElementById("screen"), frame=document.getElementById("site"), power=document.getElementById("power"),
+      dot=document.getElementById("dot"), osd=document.getElementById("osd"), led=document.getElementById("led"),
+      noise=document.getElementById("noise"), nctx=noise.getContext("2d"), spill=document.getElementById("spill");
+  var on=false, ch=3, vol=0, volOn=false, osdT=0, noiseUntil=0;
+
+  // estática
+  var img=nctx.createImageData(190,143);
+  function drawNoise(){
+    var d=img.data;
+    for(var i=0;i<d.length;i+=4){ var v=Math.random()*255|0; d[i]=d[i+1]=d[i+2]=v; d[i+3]=255; }
+    nctx.putImageData(img,0,0);
+  }
+  function loop(t){
+    if(performance.now()<noiseUntil){ drawNoise(); noise.classList.add("on"); }
+    else noise.classList.remove("on");
+    requestAnimationFrame(loop);
+  }
+  requestAnimationFrame(loop);
+  function staticFor(ms){ noiseUntil=performance.now()+ms; }
+
+  function showOSD(html,ms){ osd.innerHTML=html; osd.style.opacity=1; clearTimeout(osdT); osdT=setTimeout(function(){ osd.style.opacity=0; },ms||1800); }
+
+  function powerOn(){
+    on=true; led.classList.add("on"); screen.classList.remove("off");
+    dot.animate([{opacity:1,transform:"translate(-50%,-50%) scaleX(0) scaleY(1)"},
+                 {opacity:1,transform:"translate(-50%,-50%) scaleX(1) scaleY(1)",offset:.45},
+                 {opacity:0,transform:"translate(-50%,-50%) scaleX(1) scaleY(120)"}],{duration:520,easing:"ease-out"});
+    power.animate([{opacity:1},{opacity:1,offset:.5},{opacity:0}],{duration:700,fill:"forwards"});
+    staticFor(650); spill.style.opacity=1;
+    setTimeout(function(){ showOSD("CH 0"+ch); },700);
+  }
+  function powerOff(){
+    on=false; led.classList.remove("on"); spill.style.opacity=.25;
+    power.animate([{opacity:0},{opacity:1}],{duration:260,fill:"forwards",easing:"ease-in"});
+    dot.animate([{opacity:1,transform:"translate(-50%,-50%) scaleX(1) scaleY(60)"},
+                 {opacity:1,transform:"translate(-50%,-50%) scaleX(1) scaleY(1)",offset:.4},
+                 {opacity:1,transform:"translate(-50%,-50%) scaleX(.01) scaleY(1)",offset:.85},
+                 {opacity:0,transform:"translate(-50%,-50%) scaleX(0) scaleY(0)"}],{duration:560,easing:"ease-in"});
+    osd.style.opacity=0;
+    setTimeout(function(){ screen.classList.add("off"); },560);
+  }
+  document.getElementById("pwr").onclick=function(){ on?powerOff():powerOn(); };
+
+  // canal: estática y vuelve al 3 (el único canal que agarra es Pana)
+  var chKnob=document.getElementById("ch"), chRot=0;
+  chKnob.onclick=function(){
+    if(!on) return;
+    chRot+=45; chKnob.style.transform="rotate("+chRot+"deg)";
+    ch = ch>=5 ? 2 : ch+1;
+    if(ch===3){ staticFor(250); showOSD("CH 03"); }
+    else { staticFor(1e9); showOSD("CH 0"+ch+"<span class='bar'>SIN SEÑAL</span>",1e9); }
+    if(ch===3) noiseUntil=performance.now()+250;
+  };
+
+  // volumen: prende / apaga el sinte del sitio
+  var volKnob=document.getElementById("vol");
+  volKnob.onclick=function(){
+    if(!on) return;
+    volOn=!volOn; volKnob.style.transform="rotate("+(volOn?40:-120)+"deg)";
+    var bars=volOn?"▮▮▮▮▮▮▮▮▯▯▯▯":"▯▯▯▯▯▯▯▯▯▯▯▯";
+    showOSD("VOL<span class='bar'>"+bars+"</span>");
+    try{ var b=frame.contentDocument.getElementById("snd"); if(b) b.click(); }catch(e){}
+  };
+
+  // el sitio, sin el panel de pruebas encima
+  frame.addEventListener("load",function(){
+    try{
+      var st=frame.contentDocument.createElement("style");
+      st.textContent="#lab,#snd{display:none!important}";
+      frame.contentDocument.head.appendChild(st);
+    }catch(e){}
+  });
+
+  // scrollear en cualquier lado del videoclub mueve el sitio de adentro
+  addEventListener("wheel",function(e){
+    if(!on || ch!==3) return;
+    e.preventDefault();
+    try{ var w=frame.contentWindow;
+      w.dispatchEvent(new w.WheelEvent("wheel",{deltaX:e.deltaX,deltaY:e.deltaY,deltaMode:e.deltaMode,bubbles:true,cancelable:true}));
+    }catch(err){}
+    hint.style.opacity=0;
+  },{passive:false});
+  addEventListener("keydown",function(e){
+    if(!on || ch!==3) return;
+    try{ var w=frame.contentWindow; w.dispatchEvent(new w.KeyboardEvent("keydown",{key:e.key,code:e.code,keyCode:e.keyCode,bubbles:true})); }catch(err){}
+  });
+
+  // la cámara se mueve apenas con el mouse
+  var cam=document.getElementById("cam"), hint=document.getElementById("hint");
+  addEventListener("mousemove",function(e){
+    var dx=(e.clientX/innerWidth-.5), dy=(e.clientY/innerHeight-.5);
+    cam.style.transform="translate("+(-dx*14)+"px,"+(-dy*8)+"px)";
+  });
+
+  // la videocasetera marca 12:00 titilando, como siempre
+  setTimeout(powerOn,700);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,376 @@
+/* =====================================================================
+   ESTUDIO PANA — sitio de una sola página (transición por scroll)
+   Lienzo de diseño: 1920 x 1080  (se escala para llenar la ventana)
+   ===================================================================== */
+
+/* ---------- Tipografías ---------- */
+/* SUSTITUTO de Peridot (Adobe Fonts). Ver nota en index.html para la real. */
+@font-face{
+  font-family:"Peridot Sub Heavy";               /* Peridot Condensed HEAVY (titulares) */
+  src:url("fonts/PPRightGrotesk-CompactBlack.woff2") format("woff2");
+  font-display:swap;
+}
+@font-face{
+  font-family:"Peridot Sub";                     /* Peridot Condensed REGULAR (detalle) */
+  src:url("fonts/PPRightGrotesk-CompactRegular.woff2") format("woff2");
+  font-display:swap;
+}
+/* Secundaria / efectos visuales (real, self-hosted) */
+@font-face{
+  font-family:"PP Editorial Italic";        /* corte Ultralight Italic (secundaria) */
+  src:url("fonts/PPEditorialNew-UltralightItalic.woff2") format("woff2");
+  font-style:italic;
+  font-display:swap;
+}
+
+:root{
+  --red:#f50000;
+  --bg:#000;
+  /* Peridot PE Variable (Adobe Fonts, kit uzp2ovi). Variable 100–950.
+     Titulares = weight 900 (heavy); detalle = weight 400 (regular).
+     Sustitutos PP Right Grotesk quedan como fallback si el kit no carga. */
+  --font-main:"peridot-pe-variable", "Peridot Sub Heavy", "Arial Narrow", sans-serif;
+  --font-italic:"PP Editorial Italic", Georgia, serif;
+}
+
+*{ margin:0; padding:0; box-sizing:border-box; }
+
+html,body{ height:100%; background:var(--bg); }
+body{
+  color:var(--red);
+  overflow:hidden;            /* navegación por secciones: sin scroll nativo */
+  -webkit-font-smoothing:antialiased;
+  cursor:default;
+  letter-spacing:-0.035em;   /* interletrado -35 (tracking de diseño) en todo el sitio */
+}
+
+/* ---------- Lienzo escalado ---------- */
+.viewport{
+  position:fixed; inset:0;
+  display:flex; align-items:center; justify-content:center;
+  background:var(--bg);
+  overflow:hidden;
+  z-index:0;
+}
+.stage{
+  position:relative;
+  width:1920px; height:1080px;
+  transform:scale(var(--k,1));
+  transform-origin:center center;
+  flex:0 0 auto;
+}
+
+
+/* =====================================================================
+   LOGO  (compartido: viaja del centro hacia arriba al scrollear)
+   ===================================================================== */
+.logo{
+  position:absolute;
+  left:50%;
+  top:var(--lcy,540px);
+  width:360px; height:360px;              /* +50% (era 240) */
+  transform:translate(-50%,-50%) scale(var(--ls,1));
+  perspective:900px;
+  will-change:transform,top;
+  cursor:pointer;                 /* click en el logo -> vuelve al inicio */
+}
+/* COMETA: cada capa = óvalo + palabra. En reposo el óvalo oscila (con estela) y
+   la palabra queda fija; al scrollear, las capas laguean el viaje del logo y
+   forman la cola de cometa. Offsets y opacidades los setea script.js cada frame. */
+.comet-layer{
+  position:absolute; inset:0;
+  will-change:transform, opacity;
+}
+.cl-oval,
+.cl-word{
+  position:absolute; inset:0;
+  width:100%; height:100%;
+  overflow:visible;
+  will-change:transform;
+}
+/* el óvalo además GIRA en 3D (estela) al scrollear */
+.cl-oval{
+  transform-style:preserve-3d;
+  backface-visibility:visible;
+}
+
+/* =====================================================================
+   INICIO — estudio · [logo] · creativo
+   ===================================================================== */
+.side{
+  position:absolute;
+  top:539px;
+  transform:translateY(-50%);
+  font-family:var(--font-main);
+  font-weight:950;
+  font-variation-settings:"wght" 950, "wdth" 65;   /* Peridot Condensed Heavy */
+  font-size:36.4px;
+  line-height:1;
+  color:var(--red);
+  white-space:nowrap;
+  letter-spacing:-0.035em;   /* tracking -35 sobre el tamaño propio */
+}
+/* ancladas SIMÉTRICAS al centro (mismo eje que el óvalo): el borde interno de
+   cada palabra queda a la misma distancia del centro -> siempre alineadas,
+   sin importar el ancho de cada texto. */
+.side--left { right:calc(50% + 176px); }   /* borde derecho de "estudio" */
+.side--right{ left: calc(50% + 176px); }   /* borde izquierdo de "creativo" */
+
+/* =====================================================================
+   PANTALLA DE CINE (máscara) — servicios y proyectos suben desde abajo
+   Ventana fija: desde ~unos px debajo del logo hasta ~unos px arriba de
+   "our work". Bordes con fundido suave (look de pantalla de cine).
+   ===================================================================== */
+.screen{
+  position:absolute;
+  left:0; right:0;
+  top:330px; height:460px;         /* ventana de la máscara (1920x1080) */
+  overflow:hidden;
+  pointer-events:none;             /* el contenedor NO tapa el hover de "estudio/creativo" */
+  -webkit-mask-image:linear-gradient(to bottom, transparent 0, #000 7%, #000 93%, transparent 100%);
+          mask-image:linear-gradient(to bottom, transparent 0, #000 7%, #000 93%, transparent 100%);
+}
+/* cada "track" ocupa toda la ventana y se traslada en Y (lo hace script.js) */
+.track{
+  position:absolute; left:0; right:0; top:0; height:100%;
+  will-change:transform;
+}
+/* .proj-track ocupa todo el ancho: la lista de créditos va CENTRADA */
+
+/* SERVICIOS */
+.services__list{
+  position:absolute;
+  left:50%; top:117px;             /* centro del bloque ≈ y 534 del lienzo */
+  transform:translateX(-50%);
+  display:flex; flex-direction:column; align-items:center;
+  font-family:var(--font-main);
+  font-weight:950;
+  font-variation-settings:"wght" 950, "wdth" 65;   /* Peridot Condensed Heavy */
+  font-size:71px;
+  line-height:58px;                 /* apilado bien tight, como el PDF */
+  color:var(--red);
+  letter-spacing:-0.035em;      /* -35, coherente con el resto */
+  text-transform:uppercase;
+  white-space:nowrap;
+  pointer-events:auto;          /* devuelve eventos (la máscara es none) */
+}
+.svc{ display:block; white-space:nowrap; }
+
+/* nav fija abajo: "our work / contact" (siempre visible) */
+.footnav{
+  position:absolute;
+  left:50%; top:918px;
+  transform:translate(-50%,-50%);
+  display:flex; align-items:center; gap:.32em;
+  font-family:var(--font-main);
+  font-weight:950;
+  font-variation-settings:"wght" 950, "wdth" 65;   /* Peridot Condensed Heavy */
+  font-size:44.3px;
+  line-height:1;
+  color:var(--red);
+  white-space:nowrap;
+  letter-spacing:-0.035em;        /* tracking -35 sobre el tamaño propio */
+}
+.fn-item{ cursor:pointer; }
+.fn-sep{ opacity:.7; }
+
+/* =====================================================================
+   PROYECTOS — créditos de película (aparece al scrollear / clic en our work)
+   ===================================================================== */
+/* overlay de proyectos: SOLO nav visual (los créditos van en la máscara).
+   pointer-events:none -> no tapa el hover de los créditos que tiene debajo. */
+.projects{
+  position:absolute; inset:0;
+  opacity:0;
+  pointer-events:none;
+}
+.pnav{
+  position:absolute; top:144px;
+  transform:translateY(-50%);
+  font-family:var(--font-main);
+  font-weight:950;
+  font-variation-settings:"wght" 950, "wdth" 65;   /* Condensed Heavy */
+  font-size:36.4px;
+  color:var(--red);
+  white-space:nowrap;
+  letter-spacing:-0.035em;         /* tracking -35 sobre el tamaño propio */
+}
+.pnav--left { left:121px; }
+.pnav--right{ right:121px; }
+
+.credits{
+  position:absolute; left:0; right:0; top:0;
+  will-change:transform;
+  pointer-events:auto;          /* devuelve eventos (la máscara es none) */
+}
+.proj{
+  text-align:center;               /* tipografía centrada */
+  font-family:var(--font-main);
+  font-weight:950;
+  font-variation-settings:"wght" 950, "wdth" 65;   /* Condensed Heavy */
+  font-size:70.9px;
+  line-height:65px;                /* apilado tight como el PDF */
+  color:var(--red);
+  text-transform:uppercase;
+  white-space:nowrap;
+  letter-spacing:-0.035em;         /* tracking -35 sobre el tamaño propio */
+  transition:opacity .3s ease;
+}
+/* el área sensible al hover = SÓLO el texto (ajustado a las letras) */
+.proj__t{ display:inline-block; cursor:pointer; }
+/* ---------- miniatura FLOTANTE (gif): sigue al cursor ----------
+   Se despliega hacia ABAJO-DERECHA desde el cursor (el cursor queda en su
+   esquina superior izquierda). left/top los setea script.js. Fade+scale suave
+   desde la esquina. Sin texto ni velo: se ve la placa limpia. */
+.hoverclip{
+  position:absolute;
+  left:0; top:0;                          /* lo posiciona script.js en el cursor */
+  width:486px; height:274px;              /* 16:9 */
+  margin:0; overflow:hidden;
+  transform-origin:top left;
+  transform:scale(.96);
+  opacity:0;
+  transition:opacity .3s ease, transform .35s cubic-bezier(.22,1,.36,1);
+  pointer-events:none;
+  z-index:5;
+}
+.hoverclip.show{ opacity:1; transform:scale(1); }
+.hoverclip__img,
+.hoverclip__vid{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block; }
+
+/* =====================================================================
+   CONTACTO — sección (sube por la máscara): @estudio.pana + consulta
+   ===================================================================== */
+.contact{
+  position:absolute; left:50%; top:50%;
+  transform:translate(-50%,-50%);
+  width:560px; max-width:92%;
+  display:flex; flex-direction:column; align-items:center;
+  color:var(--red);
+  pointer-events:auto;          /* devuelve eventos (la máscara es none) */
+}
+.contact__ig{
+  font-family:var(--font-main); font-weight:950;
+  font-variation-settings:"wght" 950, "wdth" 65;
+  font-size:58px; line-height:1; letter-spacing:-0.035em;
+  color:var(--red); text-decoration:none; cursor:pointer;
+  margin-bottom:26px; white-space:nowrap;
+}
+.contact__form{ display:flex; flex-direction:column; gap:12px; width:480px; max-width:100%; }
+.cf-input{
+  background:transparent; border:none; border-bottom:2px solid var(--red);
+  color:var(--red); font-family:var(--font-main);
+  font-variation-settings:"wght" 700, "wdth" 65;
+  font-size:23px; letter-spacing:-0.02em; padding:9px 4px; outline:none;
+  resize:none; width:100%;
+}
+.cf-input::placeholder{ color:var(--red); opacity:.5; }
+.cf-send{
+  align-self:center; margin-top:10px;
+  background:var(--red); color:#000; border:none; cursor:pointer;
+  font-family:var(--font-main); font-weight:950;
+  font-variation-settings:"wght" 950, "wdth" 65;
+  font-size:26px; letter-spacing:-0.035em; text-transform:lowercase;
+  padding:9px 34px;
+}
+.cf-ok{ display:none; text-align:center; margin-top:12px; font-size:24px; letter-spacing:-0.02em; }
+.cf-hp{ position:absolute; left:-9999px; width:1px; height:1px; overflow:hidden; }
+
+/* =====================================================================
+   MORPH — Peridot  ->  PP Editorial Italic al pasar el cursor
+   ===================================================================== */
+/* Cambio de tipografía con ESTELA (sin giro): la letra hace crossfade de
+   principal (Peridot) a secundaria (Editorial itálica, minúscula) dejando un
+   rastro de ecos rojos que se recogen -> mismo espíritu que la estela del óvalo. */
+.ltr{
+  display:inline-block;
+}
+/* las dos caras van EN LA MISMA CELDA (grid) y centradas -> la letra no se
+   mueve: cambia sólo la familia tipográfica en el mismo lugar. */
+.ltr__inner{
+  display:inline-grid;
+  align-items:baseline;     /* la B y la b comparten LÍNEA BASE */
+  justify-items:center;     /* centradas horizontalmente en el mismo lugar */
+}
+.face{
+  grid-area:1 / 1;
+  transition:opacity .35s ease;
+}
+.face.front{
+  /* Peridot: define el ancho de la celda (es la más ancha) */
+}
+.face.back{
+  opacity:0;
+  font-family:var(--font-italic);          /* PP Editorial New Ultralight Italic */
+  font-style:italic;
+  font-variation-settings:normal;
+  font-size:calc(1em + 2px);               /* +2pt sobre la principal */
+  text-transform:lowercase;                /* la secundaria siempre en minúscula */
+  white-space:nowrap;
+}
+/* al hover: cruza a la secundaria + dispara la estela */
+.ltr.on .face.front{ opacity:0; }
+.ltr.on .face.back{
+  opacity:1;
+  animation:estela .5s ease-out;
+}
+@keyframes estela{
+  0%{   text-shadow: 7px 0 rgba(245,0,0,.55), 15px 0 rgba(245,0,0,.32), 24px 0 rgba(245,0,0,.16), 34px 0 rgba(245,0,0,.07); }
+  100%{ text-shadow: 0 0 rgba(245,0,0,0),     0 0 rgba(245,0,0,0),      0 0 rgba(245,0,0,0),      0 0 rgba(245,0,0,0); }
+}
+/* preserva el ancho del espacio */
+.ltr.space{ width:.28em; }
+
+/* =====================================================================
+   DETALLE DE PROYECTO — overlay a pantalla completa, scroll propio
+   ===================================================================== */
+.detail{
+  position:fixed; inset:0; z-index:100;
+  background:var(--bg);
+  color:var(--red);
+  overflow-y:auto; overflow-x:hidden;
+  opacity:0; visibility:hidden;
+  transition:opacity .4s ease, visibility 0s linear .4s;
+}
+.detail.open{ opacity:1; visibility:visible; transition:opacity .4s ease; }
+.detail__close{
+  position:fixed; top:30px; left:40px; z-index:2;
+  background:none; border:none; cursor:pointer;
+  color:var(--red);
+  font-family:var(--font-main);
+  font-weight:950; font-variation-settings:"wght" 950, "wdth" 65;
+  font-size:30px; letter-spacing:-0.035em; text-transform:lowercase;
+}
+.detail__arrow{ display:inline-block; margin-right:.22em; }
+/* logo pana del detalle (esquina sup-derecha, mismo alto que "volver") */
+.detail__logo{
+  position:fixed; top:-8px; right:26px; z-index:2;
+  width:132px; height:132px;
+  perspective:600px;                 /* para el giro 3D del óvalo */
+  cursor:pointer;                    /* click -> cierra el proyecto y vuelve al inicio */
+}
+.detail__logo .dl-layer{ position:absolute; inset:0; }
+.detail__logo .dl-oval,
+.detail__logo .dl-word{
+  position:absolute; inset:0; width:100%; height:100%; overflow:visible;
+}
+/* el óvalo gira en rotateY (estela 3D) al scrollear */
+.detail__logo .dl-oval{
+  transform-style:preserve-3d;
+  backface-visibility:visible;
+  will-change:transform;
+}
+.detail__inner{ max-width:1040px; margin:0 auto; padding:120px 20px; }
+.detail__title{
+  text-align:center; margin-bottom:44px;
+  font-family:var(--font-main);
+  font-weight:950; font-variation-settings:"wght" 950, "wdth" 65;
+  font-size:84px; line-height:.95; letter-spacing:-0.035em; text-transform:uppercase;
+}
+.detail__media{ display:flex; flex-direction:column; gap:14px; }
+.detail__media img,
+.detail__media video{ width:100%; height:auto; display:block; }
+
+/* =====================================================================
+   Accesibilidad — respeta "reduce motion"
+   ===================================================================== */

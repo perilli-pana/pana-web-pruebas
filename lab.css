@@ -1,0 +1,54 @@
+/* ===== LABORATORIO DE COLOR (sólo para pruebas, no toca el sitio real) ===== */
+:root{ --oval:var(--red); --word:var(--red); --trail:var(--red); --alt:var(--red); --sep:var(--red); }
+#pana-word path{ fill:var(--word); }
+#pana-oval ellipse{ stroke:var(--oval); }
+html.ready,.ready body,.ready .viewport,.ready .detail{ transition:background-color .4s; }
+.ready body,.ready .side,.services__list,.footnav,.pnav,.proj,.contact,.contact__ig,.cf-input,.detail,.detail__close{ transition:color .4s; }
+.cf-send{ color:var(--bg); background:var(--alt); }
+.cf-input{ border-bottom-color:var(--alt); }
+.fn-sep{ color:var(--sep); opacity:1; }
+/* bandera: alterna los servicios entre los dos colores */
+body.alt-rows .svc:nth-child(2){ color:var(--alt); }
+body.alt-rows #creativo{ color:var(--alt); }
+@keyframes estela{
+  0%{ text-shadow: 7px 0 color-mix(in srgb,var(--trail) 55%,transparent), 15px 0 color-mix(in srgb,var(--trail) 32%,transparent), 24px 0 color-mix(in srgb,var(--trail) 16%,transparent), 34px 0 color-mix(in srgb,var(--trail) 7%,transparent); }
+  100%{ text-shadow: 0 0 transparent,0 0 transparent,0 0 transparent,0 0 transparent; }
+}
+
+#lab{ position:fixed; left:16px; bottom:16px; z-index:9999; font:13px/1.3 -apple-system,system-ui,sans-serif; letter-spacing:0;
+  background:rgba(255,255,255,.96); color:#111; border-radius:12px; box-shadow:0 6px 30px rgba(0,0,0,.35); width:300px; overflow:hidden; }
+#lab header{ display:flex; justify-content:space-between; align-items:center; padding:10px 12px; font-weight:700; cursor:pointer; user-select:none; }
+#lab header small{ font-weight:400; color:#666; }
+#lab .body{ padding:0 12px 12px; }
+#lab.min .body{ display:none; }
+#lab .presets{ display:grid; grid-template-columns:1fr; gap:4px; }
+#lab button.p{ display:flex; align-items:center; gap:8px; text-align:left; border:1px solid #ddd; background:#fff; border-radius:8px; padding:6px 8px; cursor:pointer; font:inherit; color:#111; }
+#lab button.p.on{ border-color:#111; box-shadow:inset 0 0 0 1px #111; }
+#lab button.p .k{ font-weight:700; width:16px; color:#999; }
+#lab .sw{ display:flex; }
+#lab .sw i{ width:14px; height:14px; border-radius:50%; border:1px solid rgba(0,0,0,.2); margin-left:-4px; }
+#lab .sw i:first-child{ margin-left:0; }
+#lab .pick{ display:grid; grid-template-columns:repeat(4,1fr); gap:6px; margin-top:10px; padding-top:10px; border-top:1px solid #eee; }
+#lab .pick label{ display:flex; flex-direction:column; align-items:center; gap:3px; font-size:11px; color:#555; }
+#lab .pick input{ width:100%; height:26px; border:none; padding:0; background:none; cursor:pointer; }
+#lab .hex{ margin-top:8px; font:11px ui-monospace,Menlo,monospace; color:#555; word-break:break-all; }
+#lab .tip{ margin-top:6px; font-size:11px; color:#888; }
+/* tipografía de estudio / creativo */
+#lab .fonts{ display:grid; grid-template-columns:1fr 1fr; gap:4px; margin-top:10px; padding-top:10px; border-top:1px solid #eee; }
+#lab .fonts .t{ grid-column:1/-1; font-size:11px; color:#555; }
+#lab .fonts button{ border:1px solid #ddd; background:#fff; border-radius:8px; padding:5px 6px; cursor:pointer; color:#111; font-size:12px; }
+#lab .fonts button.on{ border-color:#111; box-shadow:inset 0 0 0 1px #111; }
+body[data-sf] .side, body[data-sf] .side .face.front{ font-family:"Helvetica Neue",Helvetica,Arial,sans-serif !important; font-variation-settings:normal !important; letter-spacing:-0.03em; }
+body[data-sf="bold"] .side, body[data-sf="bold"] .side .face.front{ font-weight:700 !important; }
+body[data-sf="reg"]  .side, body[data-sf="reg"]  .side .face.front{ font-weight:400 !important; }
+body[data-sf="light"] .side, body[data-sf="light"] .side .face.front{ font-weight:300 !important; }
+body[data-sf="cond"] .side, body[data-sf="cond"] .side .face.front{ font-family:"Helvetica Neue Condensed Bold","HelveticaNeue-CondensedBold","Helvetica Neue",sans-serif !important; font-weight:700 !important; font-stretch:condensed; }
+/* intro fx: el óvalo de Bruno se esconde mientras dibuja el canvas; estudio/creativo se abren */
+body.fx-on .cl-oval{ opacity:0 !important; }
+.side--left { transform:translate(calc(var(--fxa,0) * -260px),-50%); letter-spacing:calc(-0.035em + var(--fxa,0) * .25em); }
+.side--right{ transform:translate(calc(var(--fxa,0) *  260px),-50%); letter-spacing:calc(-0.035em + var(--fxa,0) * .25em); }
+.logo{ z-index:2; } .side{ z-index:2; }
+/* durante el efecto, estudio/creativo llevan un halo del color de fondo (sin recuadro) */
+body.fx-on .side{ text-shadow:0 0 4px var(--bg),0 0 8px var(--bg),0 0 12px var(--bg),0 0 18px var(--bg),0 0 26px var(--bg),0 0 36px var(--bg),0 0 36px var(--bg); }
+#snd{ position:fixed; right:16px; bottom:16px; z-index:9999; font:600 13px -apple-system,system-ui,sans-serif; letter-spacing:0;
+  background:rgba(255,255,255,.96); color:#111; border:none; border-radius:999px; padding:9px 14px; cursor:pointer; box-shadow:0 6px 30px rgba(0,0,0,.35); }

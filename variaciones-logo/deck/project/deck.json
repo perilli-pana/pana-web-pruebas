@@ -1,0 +1,109 @@
+{
+ "v": 4,
+ "createdOnFiles": {
+  "v": 1,
+  "at": "2026-10-03T05:00:00Z"
+ },
+ "lists": "css",
+ "title": "Pana — variaciones del logo",
+ "order": [
+  "portada",
+  "sistema",
+  "afiches",
+  "papeleria",
+  "stickers-original",
+  "redes",
+  "ropa",
+  "estudio",
+  "varios",
+  "pantallas",
+  "variaciones",
+  "anatomia",
+  "color-grilla",
+  "color-loco",
+  "mobius-secuencia",
+  "mobius-marca",
+  "moire",
+  "eco",
+  "eco-variantes",
+  "elastico",
+  "pixel-punto",
+  "anillo-idea",
+  "patron",
+  "stickers",
+  "remera",
+  "remeras",
+  "objetos",
+  "neon",
+  "neon-estados",
+  "neon-usos",
+  "negro-rojo",
+  "afiche",
+  "stickers-rojos",
+  "stickers-negros",
+  "notebook",
+  "cierre"
+ ],
+ "cover": "portada",
+ "sections": {
+  "s0": {
+   "description": "El logo de Bruno tal cual.",
+   "start": "portada"
+  },
+  "sa": {
+   "description": "Aplicaciones del logo original: afiches, papelería, stickers, redes, ropa, el estudio, objetos y pantallas.",
+   "start": "sistema"
+  },
+  "sb": {
+   "description": "Variaciones: un anillo y una palabra, estirados.",
+   "start": "variaciones"
+  },
+  "s1": {
+   "description": "Color: las pieles clásicas y las locas.",
+   "start": "color-grilla"
+  },
+  "s2": {
+   "description": "Möbius: el anillo que se da vuelta, como secuencia y como isotipo.",
+   "start": "mobius-secuencia"
+  },
+  "s3": {
+   "description": "Eco: el relieve de VICIO y sus variantes.",
+   "start": "eco"
+  },
+  "s4": {
+   "description": "Formas y conceptos: elástico, pixel, el anillo como idea, patrón.",
+   "start": "elastico"
+  },
+  "s5": {
+   "description": "Para usar: stickers, remeras y otras cosas.",
+   "start": "stickers"
+  },
+  "s6": {
+   "description": "Segunda tanda en negro y rojo: neón, seis tratamientos y un afiche.",
+   "start": "neon"
+  },
+  "s7": {
+   "description": "Stickers troquelados con borde blanco, rojos y negros.",
+   "start": "stickers-rojos"
+  },
+  "s8": {
+   "description": "Cómo seguir.",
+   "start": "cierre"
+  }
+ },
+ "faces": {
+  "pana-black": {
+   "family": "Pana Black",
+   "src": "/_blob/20558b040e2a6722963b50f3b1c0b3c7"
+  },
+  "pana-italic": {
+   "family": "Pana Italic",
+   "src": "/_blob/b3e430177c28b083fa0eb4cf3c02ec5a"
+  },
+  "pana-regular": {
+   "family": "Pana Regular",
+   "src": "/_blob/66052036993cd491786f95f354490f74"
+  }
+ },
+ "designSystems": []
+}

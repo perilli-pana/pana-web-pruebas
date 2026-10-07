@@ -1,0 +1,436 @@
+<title>Pana · variaciones</title>
+<style>
+/* Concepto: un visor de 9 portadas a pantalla completa, todas rojo sobre negro,
+   cada una pone a prueba una forma distinta de usar la marca. */
+@font-face{font-family:"PP Right Grotesk Compact";font-weight:900;src:url(fonts/PPRightGrotesk-CompactBlack.woff2) format("woff2");font-display:block}
+@font-face{font-family:"PP Right Grotesk Compact";font-weight:400;src:url(fonts/PPRightGrotesk-CompactRegular.woff2) format("woff2");font-display:block}
+@font-face{font-family:"PP Editorial";font-style:italic;font-weight:200;src:url(fonts/PPEditorialNew-UltralightItalic.woff2) format("woff2");font-display:block}
+:root{
+  --red:#f50000;
+  --red-mid:#9e0000;
+  --red-dim:#4a0000;
+  --red-ghost:#1c0303;
+  --ink:#000;
+  --display:"PP Right Grotesk Compact","Arial Narrow",Impact,sans-serif;
+  --italic:"PP Editorial",Georgia,"Times New Roman",serif;
+  --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{height:100%;margin:0}
+body{background:var(--ink);color:var(--red);font-family:var(--display);font-weight:400;overflow:hidden;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;padding:0}
+button:focus-visible,a:focus-visible{outline:2px solid var(--red);outline-offset:3px}
+a{color:inherit}
+svg.mk{display:block;fill:currentColor;overflow:visible}
+.o{fill:none;stroke:currentColor;stroke-width:var(--sw,3);stroke-miterlimit:10}
+
+/* ---------- visor ---------- */
+.app{height:100%;display:grid;grid-template-rows:auto 1fr auto}
+.bar{display:flex;align-items:center;gap:16px;padding:10px 16px;border-bottom:1px solid var(--red-dim);font-size:13px;letter-spacing:.08em;text-transform:uppercase}
+.bar .who{display:flex;align-items:center;gap:10px;white-space:nowrap}
+.bar .who svg{width:44px}
+.chips{display:flex;gap:2px;margin-left:auto;overflow-x:auto;scrollbar-width:none}
+.chips button{min-width:34px;height:28px;border:1px solid transparent;font-variant-numeric:tabular-nums;letter-spacing:.04em}
+.chips button:hover{border-color:var(--red-dim)}
+.chips button[aria-current="true"]{background:var(--red);color:var(--ink)}
+.stage{position:relative;overflow:hidden}
+.v{position:absolute;inset:0;overflow:hidden}
+.cap{display:flex;gap:16px;align-items:baseline;padding:10px 16px;border-top:1px solid var(--red-dim);font-size:13px;min-height:44px}
+.cap b{font-weight:900;font-size:15px;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap}
+.cap span{font-family:var(--italic);font-style:italic;font-weight:200;font-size:17px;line-height:1.25;min-width:0}
+.cap .nav{margin-left:auto;display:flex;gap:6px;white-space:nowrap}
+.cap .nav button{width:32px;height:28px;border:1px solid var(--red-dim)}
+.cap .nav button:hover{background:var(--red);color:var(--ink)}
+@media (max-width:640px){
+  .bar .who span{display:none}
+  .cap{flex-wrap:wrap;gap:4px 12px}
+  .cap span{font-size:15px;flex-basis:100%;order:3}
+}
+
+/* duotono rojo para fotos de proyectos */
+.duo{background:var(--red);overflow:hidden}
+.duo img{display:block;width:100%;height:100%;object-fit:cover;filter:grayscale(1) contrast(1.25) brightness(1.05);mix-blend-mode:multiply}
+
+/* ================= 01 GIGANTE ================= */
+.v1{display:grid;place-items:center}
+.v1-oval{position:absolute;width:max(190%,190vh);left:50%;top:50%;transform:translate(-50%,-50%) rotate(0deg);--sw:.9;animation:wob 9s ease-in-out infinite}
+.v1-word{position:relative;width:min(78%,1100px)}
+.v1 .c{position:absolute;font-weight:900;text-transform:uppercase;font-size:clamp(14px,1.6vw,22px);letter-spacing:.04em;line-height:1}
+.v1 .tl{top:24px;left:24px}.v1 .tr{top:24px;right:24px;text-align:right}
+.v1 .bl{bottom:24px;left:24px}.v1 .br{bottom:24px;right:24px;text-align:right}
+@keyframes wob{0%,100%{transform:translate(-50%,-50%) rotate(-2deg) scale(1)}50%{transform:translate(-50%,-48%) rotate(3deg) scale(1.04)}}
+
+/* ================= 02 VENTANA ================= */
+.v2{display:grid;grid-template-columns:1fr minmax(0,.55fr);align-items:center;padding:clamp(16px,4vw,56px);gap:clamp(16px,4vw,56px)}
+.v2-win{position:relative;width:100%;aspect-ratio:1.96;max-width:100%}
+.v2-win .duo{position:absolute;inset:0;border-radius:50%;transform:rotate(-3.96deg)}
+.v2-win .duo img{transition:opacity .35s}
+.v2-win svg{position:absolute;inset:-3% -2%;width:104%;--sw:1.2;transform:translate(10px,8px)}
+.v2-side{display:flex;flex-direction:column;gap:18px;min-width:0}
+.v2-name{font-family:var(--italic);font-style:italic;font-weight:200;font-size:clamp(34px,5vw,84px);line-height:.95;text-wrap:balance;min-height:2em}
+.v2-meta{font-size:14px;letter-spacing:.1em;text-transform:uppercase;font-variant-numeric:tabular-nums;color:var(--red-mid)}
+.v2-word{width:clamp(90px,10vw,150px);margin-top:12px}
+@media (max-width:760px){.v2{grid-template-columns:1fr;align-content:center}.v2-name{min-height:0}}
+
+/* ================= 03 ÍNDICE ================= */
+.v3{overflow-y:auto;padding:20px clamp(16px,3vw,40px) 40px}
+.v3-top{display:flex;align-items:flex-start;gap:24px;font-size:13px;letter-spacing:.08em;text-transform:uppercase;padding-bottom:28px}
+.v3-top svg{width:76px}
+.v3-top .r{margin-left:auto;display:flex;gap:18px}
+.v3-list{list-style:none;margin:0;padding:0;border-top:1px solid var(--red-dim)}
+.v3-list li{display:flex;align-items:baseline;gap:16px;border-bottom:1px solid var(--red-dim);padding:4px 0 0;cursor:default}
+.v3-list .t{font-weight:900;text-transform:uppercase;font-size:clamp(42px,9.5vw,150px);line-height:.84;letter-spacing:-.005em;transition:color .15s;min-width:0;overflow-wrap:anywhere}
+.v3-list .n{margin-left:auto;font-size:13px;letter-spacing:.08em;text-transform:uppercase;font-variant-numeric:tabular-nums;white-space:nowrap;padding-bottom:10px}
+.v3-list li:hover .t{color:transparent;-webkit-text-stroke:1.5px var(--red)}
+.v3-float{position:fixed;width:280px;aspect-ratio:404/316;pointer-events:none;opacity:0;transition:opacity .15s;z-index:5;transform:translate(-50%,-50%) rotate(-4deg)}
+.v3-float.on{opacity:1}
+
+/* ================= 04 SELLO ================= */
+.v4{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(16px,4vw,64px);align-items:center;padding:clamp(16px,4vw,56px);overflow-y:auto}
+.v4-seal{position:relative;width:min(100%,62vh);aspect-ratio:1;justify-self:center}
+.v4-seal .ring{position:absolute;inset:0;width:100%;height:100%;animation:spin 28s linear infinite}
+.v4-seal .ring text{font-family:var(--display);font-weight:900;font-size:13.4px;letter-spacing:.21em;fill:var(--red)}
+.v4-seal .m{position:absolute;inset:24%;width:52%}
+@keyframes spin{to{transform:rotate(360deg)}}
+.v4-scale h3,.v4-scale h4{margin:0;font-weight:400;font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--red-mid)}
+.v4-scale{display:flex;flex-direction:column;gap:22px;min-width:0}
+.v4-row{display:flex;align-items:flex-end;gap:clamp(12px,2.4vw,28px);flex-wrap:wrap}
+.v4-row figure{margin:0;display:flex;flex-direction:column;align-items:center;gap:8px}
+.v4-row figcaption{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--red-mid);font-variant-numeric:tabular-nums}
+.v4-av{display:flex;align-items:center;gap:14px;padding:14px;border:1px solid var(--red-dim);max-width:360px}
+.v4-av .pic{width:64px;height:64px;border-radius:50%;background:var(--red);color:var(--ink);display:grid;place-items:center;flex:none}
+.v4-av .pic svg{width:44px}
+.v4-av b{display:block;font-weight:900;font-size:17px;letter-spacing:.02em}
+.v4-av small{font-family:var(--italic);font-style:italic;font-weight:200;font-size:15px}
+.v4-tab{display:flex;align-items:center;gap:8px;background:var(--red-ghost);border:1px solid var(--red-dim);border-bottom:0;padding:8px 12px;width:max-content;max-width:100%;font-size:13px;border-radius:8px 8px 0 0}
+@media (max-width:760px){.v4{grid-template-columns:1fr;align-content:start}.v4-seal{width:min(100%,46vh)}}
+
+/* ================= 05 EMPAPELADO ================= */
+.v5{display:flex;flex-direction:column;justify-content:center;gap:6px}
+.v5-row{display:flex;gap:28px;width:max-content;animation:drift 60s linear infinite}
+.v5-row:nth-child(even){animation-direction:reverse;margin-left:-90px}
+.v5-row svg{width:clamp(80px,9vw,130px);color:var(--red-dim);transition:color .2s;flex:none}
+.v5-row svg:hover{color:var(--red)}
+@keyframes drift{to{transform:translateX(-50%)}}
+.v5-card{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:var(--ink);padding:clamp(20px,4vw,48px) clamp(24px,5vw,64px);display:flex;flex-direction:column;align-items:center;gap:14px;box-shadow:0 0 0 1px var(--red),0 0 0 14px var(--ink),0 0 0 15px var(--red-dim);max-width:calc(100% - 48px)}
+.v5-card svg{width:min(380px,60vw)}
+.v5-card p{margin:0;font-family:var(--italic);font-style:italic;font-weight:200;font-size:clamp(18px,2vw,26px);text-align:center}
+
+/* ================= 06 FÓSFORO ================= */
+.v6{background:radial-gradient(ellipse at 50% 40%,#1a0000 0%,var(--ink) 70%);display:grid;grid-template-rows:1fr auto;padding:clamp(16px,3vw,40px)}
+.v6::after{content:"";position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(to bottom,rgba(0,0,0,0) 0 2px,rgba(0,0,0,.45) 2px 4px);mix-blend-mode:multiply}
+.v6-logo{place-self:center;width:min(760px,86%);filter:drop-shadow(0 0 6px rgba(245,0,0,.85)) drop-shadow(0 0 22px rgba(245,0,0,.45));animation:flick 5s steps(1) infinite}
+.v6-logo use.w{fill:none;stroke:currentColor;stroke-width:.7}
+.v6-logo{--sw:.7}
+@keyframes flick{0%,100%{opacity:1}41%{opacity:.82}42%{opacity:1}77%{opacity:.6}78%{opacity:1}79%{opacity:.88}80%{opacity:1}}
+.v6-term{font-family:var(--mono);font-size:clamp(12px,1.25vw,16px);line-height:1.55;white-space:pre-wrap;text-shadow:0 0 6px rgba(245,0,0,.8);max-width:72ch;min-width:0}
+.v6-term .d{color:var(--red-mid)}
+.v6-term .cur{display:inline-block;width:.6em;height:1.05em;background:var(--red);vertical-align:-.15em;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+
+/* ================= 07 DESARMADO ================= */
+.v7 .L{position:absolute;height:min(40vh,34vw);transition:transform .5s cubic-bezier(.2,.7,.2,1)}
+.v7 .L svg{height:100%;width:auto}
+.v7 .l1{top:20px;left:20px}.v7 .l2{top:20px;right:20px}.v7 .l3{bottom:20px;left:20px}.v7 .l4{bottom:20px;right:20px}
+.v7-mid{position:absolute;left:50%;top:50%;width:min(56vw,620px);transform:translate(-50%,-50%);display:grid;place-items:center}
+.v7-mid svg{width:100%;--sw:1.5;animation:wob2 7s ease-in-out infinite}
+.v7-mid p{position:absolute;margin:0;font-family:var(--italic);font-style:italic;font-weight:200;font-size:clamp(20px,3.4vw,46px);white-space:nowrap}
+@keyframes wob2{0%,100%{transform:rotate(-3deg)}50%{transform:rotate(4deg)}}
+@media (max-width:640px){.v7 .L{height:22vh}.v7-mid{width:80vw}}
+
+/* ================= 08 BANDA ================= */
+.v8{display:grid;grid-template-rows:auto 1fr auto;overflow-y:auto}
+.v8-top{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:20px clamp(16px,3vw,40px);font-weight:900;text-transform:uppercase;font-size:clamp(20px,2.6vw,40px);line-height:.95}
+.v8-top span:last-child{font-family:var(--italic);font-style:italic;font-weight:200;text-transform:none;font-size:clamp(18px,2vw,28px);align-self:flex-end}
+.v8-band{background:var(--red);color:var(--ink);display:grid;place-items:center;padding:clamp(12px,2vw,28px) 16px;min-height:200px}
+.v8-band svg{width:min(980px,92%);--sw:2.4}
+.v8-foot{display:grid;grid-template-columns:repeat(3,minmax(0,1fr)) minmax(0,1.1fr);gap:clamp(10px,1.6vw,20px);padding:20px clamp(16px,3vw,40px)}
+.v8-foot figure{margin:0;display:flex;flex-direction:column;gap:6px;min-width:0}
+.v8-foot .duo{aspect-ratio:404/316}
+.v8-foot figcaption{font-size:13px;letter-spacing:.08em;text-transform:uppercase}
+.v8-foot .ct{display:flex;flex-direction:column;justify-content:flex-end;gap:6px;font-size:13px;letter-spacing:.08em;text-transform:uppercase}
+.v8-foot .ct b{font-size:clamp(20px,2vw,30px);letter-spacing:0;text-transform:none;font-weight:900}
+@media (max-width:760px){.v8-foot{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* ================= 09 FIRMA ================= */
+.v9{display:grid;place-items:center}
+.v9-c{display:flex;flex-direction:column;align-items:center;gap:22px;padding:16px}
+.v9-c svg{width:150px;cursor:default}
+.v9-c svg use.o{transform-origin:131px 131px;transition:transform 1.4s cubic-bezier(.2,.7,.2,1)}
+.v9-c svg:hover use.o{transform:rotate(180deg)}
+.v9-c p{margin:0;font-family:var(--italic);font-style:italic;font-weight:200;font-size:20px;text-align:center}
+.v9 .foot{position:absolute;bottom:22px;left:0;right:0;display:flex;justify-content:center;gap:40px;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--red-mid)}
+
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+</style>
+
+<!-- ======== marca: piezas del logo (paths originales del SVG de pana) ======== -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <path id="lp" d="{{P}}"/>
+    <path id="la1" d="{{A1}}"/>
+    <path id="ln" d="{{N}}"/>
+    <path id="la2" d="{{A2}}"/>
+    <ellipse id="lo" cx="131.08" cy="131.08" rx="88.3" ry="45.01" transform="translate(-8.75 9.37) rotate(-3.96)"/>
+    <ellipse id="lmo" cx="69.5" cy="140.5" rx="50" ry="39" transform="rotate(-3.96 69.5 140.5)"/>
+  <g id="s-logo"><use href="#lp"/><use href="#la1"/><use href="#ln"/><use href="#la2"/><use class="o" href="#lo"/></g>
+  <g id="s-word"><use href="#lp"/><use href="#la1"/><use href="#ln"/><use href="#la2"/></g>
+  <g id="s-oval"><use class="o" href="#lo"/></g>
+  <g id="s-mono"><use href="#lp"/><use class="o" href="#lmo"/></g>
+  <g id="s-p"><use href="#lp"/></g>
+  <g id="s-a1"><use href="#la1"/></g>
+  <g id="s-n"><use href="#ln"/></g>
+  <g id="s-a2"><use href="#la2"/></g>
+  </defs>
+</svg>
+
+<div class="app">
+  <header class="bar">
+    <div class="who"><svg class="mk" viewBox="38 76 186 110"><use href="#s-logo"/></svg><span>variaciones · rojo sobre negro</span></div>
+    <nav class="chips" id="chips" aria-label="Variaciones"></nav>
+  </header>
+
+  <div class="stage" id="stage">
+
+    <!-- 01 -->
+    <section class="v v1" data-n="Gigante" data-q="Logo completo como héroe. El óvalo se escapa de la pantalla y la palabra queda firme en el centro. ¿El óvalo puede vivir a otra escala que la palabra?">
+      <svg class="mk v1-oval" viewBox="38 76 186 110" aria-hidden="true"><use href="#s-oval"/></svg>
+      <svg class="mk v1-word" viewBox="43 106 170 69" role="img" aria-label="pana"><use href="#s-word"/></svg>
+      <div class="c tl">estudio</div><div class="c tr">creativo</div>
+      <div class="c bl">branding<br>audiovisual<br>social media</div>
+      <div class="c br">our work<br>contact</div>
+    </section>
+
+    <!-- 02 -->
+    <section class="v v2" data-n="Ventana" data-q="Isotipo solo: el óvalo, sin la palabra, funciona como ventana a los trabajos. ¿El óvalo ya dice pana sin la palabra al lado?" hidden>
+      <div class="v2-win">
+        <div class="duo"><img id="v2img" alt=""></div>
+        <svg class="mk" viewBox="38 76 186 110" aria-hidden="true"><use href="#s-oval"/></svg>
+      </div>
+      <div class="v2-side">
+        <div class="v2-meta" id="v2meta">01 / 09</div>
+        <div class="v2-name" id="v2name">Pesquera Co</div>
+        <svg class="mk v2-word" viewBox="43 106 170 69" role="img" aria-label="pana"><use href="#s-word"/></svg>
+      </div>
+    </section>
+
+    <!-- 03 -->
+    <section class="v v3" data-n="Índice" data-q="Logotipo chico y sin óvalo. Los nombres de los proyectos hacen el ruido. ¿Pana se banca ser discreto? Pasá el mouse por los nombres." hidden>
+      <div class="v3-top">
+        <svg class="mk" viewBox="43 106 170 69" role="img" aria-label="pana"><use href="#s-word"/></svg>
+        <span>estudio creativo</span>
+        <div class="r"><span>branding</span><span>audiovisual</span><span>social media</span></div>
+      </div>
+      <ul class="v3-list" id="v3list"></ul>
+      <div class="v3-float duo" id="v3float"><img alt=""></div>
+    </section>
+
+    <!-- 04 -->
+    <section class="v v4" data-n="Sello" data-q="Monograma p + óvalo para avatar, favicon y sello. A la derecha está en tamaños reales: ¿se lee a 16 px?" hidden>
+      <div class="v4-seal">
+        <svg class="ring" viewBox="0 0 300 300" aria-hidden="true">
+          <defs><path id="circ" d="M150,150 m-128,0 a128,128 0 1,1 256,0 a128,128 0 1,1 -256,0"/></defs>
+          <text><textPath href="#circ">ESTUDIO CREATIVO · BRANDING · AUDIOVISUAL · SOCIAL MEDIA · PANA ·</textPath></text>
+        </svg>
+        <svg class="mk m" viewBox="16 98 108 86" role="img" aria-label="p de pana"><use href="#s-mono"/></svg>
+      </div>
+      <div class="v4-scale">
+        <h3>monograma en tamaños reales</h3>
+        <div class="v4-row" id="v4mono"></div>
+        <h4>logo completo a los mismos tamaños</h4>
+        <div class="v4-row" id="v4logo"></div>
+        <h4>en uso</h4>
+        <div class="v4-tab"><svg class="mk" style="width:16px" viewBox="16 98 108 86"><use href="#s-mono"/></svg>Estudio Pana</div>
+        <div class="v4-av">
+          <div class="pic"><svg class="mk" viewBox="16 98 108 86"><use href="#s-mono"/></svg></div>
+          <div><b>estudio.pana</b><small>branding, audiovisual y social media</small></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 05 -->
+    <section class="v v5" data-n="Empapelado" data-q="El logo como textura que se repite y se mueve. Sirve para fondos, packaging, merch. ¿Aguanta la repetición sin cansar?" hidden>
+      <div id="v5rows" style="display:flex;flex-direction:column;gap:22px"></div>
+      <div class="v5-card">
+        <svg class="mk" viewBox="38 76 186 110" role="img" aria-label="pana"><use href="#s-logo"/></svg>
+        <p>estudio creativo</p>
+      </div>
+    </section>
+
+    <!-- 06 -->
+    <section class="v v6" data-n="Fósforo" data-q="Logo solo en línea, sin relleno, con brillo de tubo viejo. Pana más técnico y nocturno. ¿El logo se sostiene vacío?" hidden>
+      <svg class="mk v6-logo" viewBox="38 76 186 110" role="img" aria-label="pana">
+        <use class="w" href="#lp"/><use class="w" href="#la1"/><use class="w" href="#ln"/><use class="w" href="#la2"/><use class="o" href="#lo"/>
+      </svg>
+      <div class="v6-term" id="v6term"></div>
+    </section>
+
+    <!-- 07 -->
+    <section class="v v7" data-n="Desarmado" data-q="Logotipo desarmado: cada letra suelta en una esquina y el óvalo en el centro. Un sistema flexible para aplicaciones. Mové el mouse." hidden>
+      <div class="L l1" data-k="1"><svg class="mk" viewBox="44 106 51 68"><use href="#s-p"/></svg></div>
+      <div class="L l2" data-k="2"><svg class="mk" viewBox="89 106 45 68"><use href="#s-a1"/></svg></div>
+      <div class="L l3" data-k="3"><svg class="mk" viewBox="125 106 43 68"><use href="#s-n"/></svg></div>
+      <div class="L l4" data-k="4"><svg class="mk" viewBox="166 106 45 68"><use href="#s-a2"/></svg></div>
+      <div class="v7-mid">
+        <svg class="mk" viewBox="38 76 186 110" aria-hidden="true"><use href="#s-oval"/></svg>
+        <p>estudio creativo</p>
+      </div>
+    </section>
+
+    <!-- 08 -->
+    <section class="v v8" data-n="Banda" data-q="Negativo: logo negro sobre una banda roja, como acento. El fondo sigue negro. ¿Sumamos el rojo como superficie y no solo como tinta?" hidden>
+      <div class="v8-top"><span>Branding<br>Audiovisual<br>Social media</span><span>estudio creativo</span></div>
+      <div class="v8-band"><svg class="mk" viewBox="38 76 186 110" role="img" aria-label="pana"><use href="#s-logo"/></svg></div>
+      <div class="v8-foot" id="v8foot"></div>
+    </section>
+
+    <!-- 09 -->
+    <section class="v v9" data-n="Firma" data-q="Mínimo absoluto: logo chico, mucho negro, una sola línea. Pana como firma. ¿Menos es más pana?" hidden>
+      <div class="v9-c">
+        <svg class="mk" viewBox="38 76 186 110" role="img" aria-label="pana"><use href="#lp"/><use href="#la1"/><use href="#ln"/><use href="#la2"/><use class="o" href="#lo"/></svg>
+        <p>branding, audiovisual y social media</p>
+      </div>
+      <div class="foot"><span>our work</span><span>@estudio.pana</span><span>contact</span></div>
+    </section>
+
+  </div>
+
+  <footer class="cap">
+    <b id="capn"></b><span id="capq"></span>
+    <div class="nav"><button id="prev" aria-label="Anterior">←</button><button id="next" aria-label="Siguiente">→</button></div>
+  </footer>
+</div>
+
+<script>
+(function(){
+  var PROJECTS = [
+    ["Pesquera Co","pesquera-co",11],["Logofolio v.2","logofolio-v2",11],["Logofolio v.1","logofolio-v1",13],
+    ["Cantina Bernardo","cantina-bernardo",15],["Furias","furias",10],["Raza Argentina","raza-argentina",10],
+    ["Bodegón Co","bodegon-co",14],["Vialmaq","vialmaq",14],["Planta Baja","planta-baja",13]
+  ];
+  var IMG = {
+    "pesquera-co":"img/pesquera-co.jpg","logofolio-v2":"img/logofolio-v2.jpg","logofolio-v1":"img/logofolio-v1.jpg",
+    "cantina-bernardo":"img/cantina-bernardo.jpg","furias":"img/furias.jpg","raza-argentina":"img/raza-argentina.jpg",
+    "bodegon-co":"img/bodegon-co.jpg","vialmaq":"img/vialmaq.jpg","planta-baja":"img/planta-baja.jpg"
+  };
+  var pad = function(n){return (n<10?"0":"")+n};
+  var $ = function(id){return document.getElementById(id)};
+
+  /* ---- visor ---- */
+  var views = [].slice.call(document.querySelectorAll(".v"));
+  var chips = $("chips"), cur = 0;
+  views.forEach(function(v,i){
+    var b = document.createElement("button");
+    b.textContent = pad(i+1); b.title = v.dataset.n;
+    b.onclick = function(){go(i)};
+    chips.appendChild(b);
+  });
+  function go(i){
+    cur = (i+views.length)%views.length;
+    views.forEach(function(v,k){v.hidden = k!==cur});
+    [].forEach.call(chips.children,function(b,k){b.setAttribute("aria-current",k===cur)});
+    $("capn").textContent = pad(cur+1)+" "+views[cur].dataset.n;
+    $("capq").textContent = views[cur].dataset.q;
+    if(history.replaceState) history.replaceState(null,"","#v"+(cur+1));
+    if(cur===5) typeTerm();
+  }
+  $("prev").onclick=function(){go(cur-1)}; $("next").onclick=function(){go(cur+1)};
+  addEventListener("keydown",function(e){
+    if(e.key==="ArrowRight") go(cur+1);
+    else if(e.key==="ArrowLeft") go(cur-1);
+    else if(/^[1-9]$/.test(e.key)) go(+e.key-1);
+  });
+
+  /* ---- 02 ventana ---- */
+  var k2 = 0, img2 = $("v2img"), paused = false;
+  function show2(){
+    var p = PROJECTS[k2];
+    img2.style.opacity = 0;
+    setTimeout(function(){img2.src = IMG[p[1]]; img2.style.opacity = 1},180);
+    $("v2name").textContent = p[0];
+    $("v2meta").textContent = pad(k2+1)+" / "+pad(PROJECTS.length)+" · "+p[2]+" piezas";
+  }
+  img2.src = IMG[PROJECTS[0][1]]; show2();
+  document.querySelector(".v2-win").onmouseenter=function(){paused=true};
+  document.querySelector(".v2-win").onmouseleave=function(){paused=false};
+  setInterval(function(){ if(cur===1 && !paused){k2=(k2+1)%PROJECTS.length; show2()} },2200);
+
+  /* ---- 03 índice ---- */
+  var list = $("v3list"), fl = $("v3float"), flimg = fl.querySelector("img");
+  PROJECTS.forEach(function(p){
+    var li = document.createElement("li");
+    li.innerHTML = '<span class="t"></span><span class="n"></span>';
+    li.querySelector(".t").textContent = p[0];
+    li.querySelector(".n").textContent = p[2]+" piezas";
+    li.onmouseenter = function(){flimg.src = IMG[p[1]]; fl.classList.add("on")};
+    li.onmouseleave = function(){fl.classList.remove("on")};
+    list.appendChild(li);
+  });
+  addEventListener("mousemove",function(e){fl.style.left=e.clientX+"px"; fl.style.top=e.clientY+"px"});
+
+  /* ---- 04 escala ---- */
+  [16,24,32,48,96].forEach(function(s){
+    $("v4mono").insertAdjacentHTML("beforeend",'<figure><svg class="mk" style="width:'+s+'px" viewBox="16 98 108 86"><use href="#s-mono"/></svg><figcaption>'+s+' px</figcaption></figure>');
+    $("v4logo").insertAdjacentHTML("beforeend",'<figure><svg class="mk" style="width:'+s+'px" viewBox="38 76 186 110"><use href="#s-logo"/></svg><figcaption>'+s+' px</figcaption></figure>');
+  });
+
+  /* ---- 05 empapelado ---- */
+  var rows = $("v5rows"), tile = '<svg class="mk" viewBox="38 76 186 110"><use href="#s-logo"/></svg>';
+  for(var r=0;r<9;r++){
+    var row = document.createElement("div"); row.className="v5-row";
+    row.style.animationDuration = (50+r*7)+"s";
+    row.innerHTML = new Array(33).join(tile);
+    rows.appendChild(row);
+  }
+
+  /* ---- 06 terminal ---- */
+  var TERM = [
+    ['d','PANA/OS · estudio creativo'],
+    ['','> ls servicios/'],
+    ['d','branding   audiovisual   social_media'],
+    ['','> ls proyectos/'],
+    ['d',PROJECTS.map(function(p){return p[1]}).join("   ")],
+    ['','> contacto'],
+    ['d','@estudio.pana']
+  ];
+  var termT = null, term = $("v6term");
+  function renderTerm(n){
+    var html = "", left = n;
+    TERM.forEach(function(l){
+      if(left<=0) return;
+      var t = l[1].slice(0,left); left -= l[1].length;
+      html += '<span class="'+l[0]+'">'+t.replace(/</g,"&lt;")+'</span>\n';
+    });
+    term.innerHTML = html.replace(/\n$/,"")+(n>=total?'\n> ':'')+'<span class="cur"></span>';
+  }
+  var total = TERM.reduce(function(a,l){return a+l[1].length},0);
+  renderTerm(total);
+  function typeTerm(){
+    clearInterval(termT);
+    if(matchMedia("(prefers-reduced-motion: reduce)").matches){renderTerm(total);return}
+    var n = 0; termT = setInterval(function(){ n+=3; renderTerm(Math.min(n,total)); if(n>=total) clearInterval(termT) },16);
+  }
+
+  /* ---- 07 desarmado: las letras siguen el mouse ---- */
+  var Ls = document.querySelectorAll(".v7 .L");
+  document.querySelector(".v7").addEventListener("mousemove",function(e){
+    var r = this.getBoundingClientRect(), x = (e.clientX-r.left)/r.width-.5, y = (e.clientY-r.top)/r.height-.5;
+    Ls.forEach(function(L,i){
+      var sx = i%2?-1:1, sy = i<2?1:-1;
+      L.style.transform = "translate("+(x*60*sx)+"px,"+(y*40*sy)+"px) rotate("+(x*6*sx)+"deg)";
+    });
+  });
+
+  /* ---- 08 banda ---- */
+  [0,3,6].forEach(function(i){
+    var p = PROJECTS[i];
+    $("v8foot").insertAdjacentHTML("beforeend",'<figure><div class="duo"><img alt="" src="'+IMG[p[1]]+'"></div><figcaption>'+p[0]+'</figcaption></figure>');
+  });
+  $("v8foot").insertAdjacentHTML("beforeend",'<div class="ct"><span>contacto</span><b>@estudio.pana</b><span>our work · '+PROJECTS.length+' proyectos</span></div>');
+
+  var m = /^#v([1-9])$/.exec(location.hash);
+  go(m ? +m[1]-1 : 0);
+})();
+</script>

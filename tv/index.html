@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pana TV</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;overflow:hidden;background:#000}
+
+/* la escena es la foto a su tamaño real (2048x1144), escalada para llenar la ventana */
+#scene{position:absolute;left:0;top:0;width:2048px;height:1144px;transform-origin:0 0}
+#gl,#photo{position:absolute;inset:0;width:100%;height:100%;display:block}
+#photo{visibility:hidden}
+
+/* pantalla: 1320x1080, mapeada en perspectiva sobre el vidrio de la tele */
+#scr{position:absolute;left:0;top:0;width:1320px;height:1080px;transform-origin:0 0;overflow:hidden;
+  border-radius:90px/80px;background:#000}
+#site{position:absolute;left:-300px;top:0;width:1920px;height:1080px;border:0;background:#000}
+#scr .fx{position:absolute;inset:0;pointer-events:none;border-radius:inherit}
+.scan{background:repeating-linear-gradient(to bottom,rgba(0,0,0,.32) 0 2px,transparent 2px 5px)}
+.mask{background:repeating-linear-gradient(to right,rgba(255,40,30,.07) 0 2px,rgba(0,0,0,.12) 2px 4px,transparent 4px 6px);mix-blend-mode:screen}
+.roll{height:200%;background:linear-gradient(to bottom,transparent 40%,rgba(255,255,255,.045) 48%,rgba(255,255,255,.07) 50%,transparent 56%);animation:roll 8s linear infinite}
+@keyframes roll{from{transform:translateY(-50%)}to{transform:translateY(0)}}
+.vig{box-shadow:inset 0 0 220px 70px rgba(0,0,0,.9),inset 0 0 40px 12px rgba(0,0,0,.95)}
+.glass{background:
+  radial-gradient(ellipse 45% 70% at 8% 30%,rgba(255,236,205,.16),transparent 70%),
+  linear-gradient(105deg,rgba(255,240,215,.10) 0%,rgba(255,240,215,.03) 30%,transparent 42%),
+  radial-gradient(ellipse 70% 35% at 55% 6%,rgba(255,255,255,.07),transparent 70%);mix-blend-mode:screen}
+.flick{background:#fff;mix-blend-mode:overlay;animation:fl .1s steps(2) infinite}
+@keyframes fl{0%{opacity:.01}50%{opacity:.035}}
+
+#dust{position:fixed;inset:0;pointer-events:none;mix-blend-mode:screen}
+#grain{position:fixed;inset:-50%;width:200%;height:200%;pointer-events:none;opacity:.2;mix-blend-mode:overlay;animation:gr .4s steps(3) infinite;
+  background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='260' height='260'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>")}
+@keyframes gr{0%{transform:translate(0,0)}33%{transform:translate(-2%,1.5%)}66%{transform:translate(1.5%,-2%)}}
+#vign{position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse 85% 85% at 50% 50%,transparent 40%,rgba(0,0,0,.65))}
+.bar{position:fixed;left:0;right:0;background:#000;pointer-events:none}
+#barT{top:0} #barB{bottom:0}
+#black{position:fixed;inset:0;background:#000;pointer-events:none;transition:opacity 2.8s ease}
+#black.go{opacity:0}
+@media (prefers-reduced-motion:reduce){.roll,.flick,#grain{animation:none}}
+</style>
+</head>
+<body>
+<div id="scene">
+  <img id="photo" src="escena.jpg" alt="">
+  <canvas id="gl" width="2048" height="1144"></canvas>
+  <div id="scr">
+    <iframe id="site" src="../index.html?fx=mobius#1" allow="autoplay" title="Estudio Pana"></iframe>
+    <div class="fx mask"></div><div class="fx scan"></div><div class="fx roll"></div><div class="fx flick"></div>
+    <div class="fx vig"></div><div class="fx glass"></div>
+  </div>
+</div>
+<canvas id="dust"></canvas>
+<div id="grain"></div><div id="vign"></div>
+<div class="bar" id="barT"></div><div class="bar" id="barB"></div>
+<div id="black"></div>
+
+<script id="fs" type="x-shader/x-fragment">
+precision highp float;
+uniform sampler2D img; uniform float t; varying vec2 uv;
+const vec2 SZ=vec2(2048.,1144.);
+float hash(vec2 p){ return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453); }
+float noise(vec2 p){ vec2 i=floor(p),f=fract(p),u=f*f*(3.-2.*f);
+  return mix(mix(hash(i),hash(i+vec2(1,0)),u.x),mix(hash(i+vec2(0,1)),hash(i+vec2(1,1)),u.x),u.y); }
+float fbm(vec2 p){ float v=0.,a=.5; for(int i=0;i<4;i++){ v+=a*noise(p); p=p*2.03+17.1; a*=.5; } return v; }
+// rectángulo con bordes suaves (en px de la foto)
+float box(vec2 p,vec4 r,float f){ vec2 a=smoothstep(r.xy,r.xy+f,p)*(1.-smoothstep(r.zw-f,r.zw,p)); return a.x*a.y; }
+
+void main(){
+  vec2 px=uv*SZ;
+  // ráfagas de viento: van y vienen
+  float gust=.25+.75*smoothstep(.2,.9,noise(vec2(t*.12,3.)));
+  vec2 d=vec2(0.);
+
+  // cortinas: cuelgan de arriba, se mueven más abajo
+  float hy=px.y/SZ.y;
+  float mC=box(px,vec4(0.,0.,170.,1144.),30.)+box(px,vec4(458.,0.,700.,990.),30.);
+  float wave=sin(t*1.05+px.y*.011+px.x*.012)+.5*sin(t*1.7+px.y*.02);
+  d.x+=mC*gust*5.5*pow(hy,1.3)*wave;
+  d.y+=mC*gust*.8*sin(t*.9+px.x*.03);
+
+  // árboles de afuera, por la ventana
+  vec3 c0=texture2D(img,uv).rgb;
+  float leafy=smoothstep(.06,.2,c0.r-c0.b)*smoothstep(.15,.3,c0.r-c0.g*.6);   // sólo el follaje naranja, no el marco blanco
+  float mT=box(px,vec4(165.,0.,462.,600.),24.)*(1.-smoothstep(380.,560.,px.y)*.7)*leafy;
+  d+=mT*(.6+gust)*vec2(fbm(px*.025+vec2(t*.5,t*.13))-.5,fbm(px*.025+vec2(-t*.35,9.))-.5)*4.5;
+
+  // planta colgante
+  float mP=box(px,vec4(1385.,140.,1540.,272.),14.);
+  d.x+=mP*sin(t*.7+px.y*.05)*1.6*clamp((px.y-140.)/130.,0.,1.)*(.5+gust);
+
+  vec3 c=texture2D(img,(px-d)/SZ).rgb;
+
+  // sol: sombras de hojas que pasan por lo que está iluminado + nubes
+  float lum=dot(c,vec3(.299,.587,.114));
+  float sun=smoothstep(.42,.8,lum)*smoothstep(.0,.12,c.r-c.b);
+  float notWin=1.-box(px,vec4(150.,0.,470.,700.),20.);
+  vec2 lp=px*.0065+vec2(t*.05,t*.018)+vec2(fbm(px*.004+t*.07)*1.5);
+  float leaves=smoothstep(.35,.7,fbm(lp));
+  float cloud=.88+.12*smoothstep(.3,.7,noise(vec2(t*.05,1.)));
+  c*=mix(1.,mix(.78,1.08,leaves)*cloud,sun*notWin);
+  c*=mix(1.,cloud,box(px,vec4(150.,0.,470.,700.),20.)*.6);
+
+  // rayos de luz entrando por la ventana, con aire que se mueve
+  vec2 dir=normalize(vec2(1.,.62));
+  float along=dot(px-vec2(300.,120.),dir), across=dot(px-vec2(300.,120.),vec2(-dir.y,dir.x));
+  float sh=fbm(vec2(across*.010+t*.04,along*.0012-t*.02));
+  float shafts=smoothstep(.42,.78,sh)*smoothstep(-260.,60.,across)*(1.-smoothstep(120.,520.,across))
+              *smoothstep(80.,260.,along)*(1.-smoothstep(700.,1300.,along));
+  c+=vec3(1.,.88,.7)*shafts*.10*cloud;
+
+  // la tele tira luz roja y titila sobre la pared y el mueble
+  float fl=.82+.08*sin(t*11.)+.06*sin(t*27.3)+.06*noise(vec2(t*9.,0.));
+  float tv=length((px-vec2(1007.,500.))/vec2(360.,300.));
+  c+=vec3(1.,.18,.08)*.13*exp(-tv*tv*1.4)*fl;
+
+  // color de película: sombras un poco frías, luces cálidas, menos saturado
+  float l2=dot(c,vec3(.299,.587,.114));
+  c=mix(vec3(l2),c,.88);
+  c+=vec3(-.012,.004,.02)*(1.-smoothstep(.0,.45,l2));
+  gl_FragColor=vec4(c,1.);
+}
+</script>
+<script>
+(function(){
+  var IW=2048, IH=1144, STILL=/still/.test(location.search);
+  var Q=[[867,361],[1146,363],[1145,590],[869,600]];    // esquinas del vidrio en la foto
+
+  /* ---------- pantalla en perspectiva (homografía) ---------- */
+  function solve(A,b){var n=b.length,i,j,k;for(i=0;i<n;i++){var m=i;for(k=i+1;k<n;k++)if(Math.abs(A[k][i])>Math.abs(A[m][i]))m=k;
+    var t=A[i];A[i]=A[m];A[m]=t;t=b[i];b[i]=b[m];b[m]=t;for(k=i+1;k<n;k++){var f=A[k][i]/A[i][i];for(j=i;j<n;j++)A[k][j]-=f*A[i][j];b[k]-=f*b[i];}}
+    var x=new Array(n);for(i=n-1;i>=0;i--){var s=b[i];for(j=i+1;j<n;j++)s-=A[i][j]*x[j];x[i]=s/A[i][i];}return x;}
+  var W=1320,H=1080,src=[[0,0],[W,0],[W,H],[0,H]],A=[],b=[];
+  for(var i=0;i<4;i++){var x=src[i][0],y=src[i][1],u=Q[i][0],v=Q[i][1];
+    A.push([x,y,1,0,0,0,-u*x,-u*y]);b.push(u);A.push([0,0,0,x,y,1,-v*x,-v*y]);b.push(v);}
+  var h=solve(A,b);
+  document.getElementById("scr").style.transform="matrix3d("+[h[0],h[3],0,h[6],h[1],h[4],0,h[7],0,0,1,0,h[2],h[5],0,1].join(",")+")";
+
+  /* ---------- el cuarto vivo (WebGL) ---------- */
+  var photo=document.getElementById("photo"), cv=document.getElementById("gl");
+  var gl=cv.getContext("webgl",{premultipliedAlpha:false,antialias:false}), prog=null, uT=null;
+  function sh(type,src){ var s=gl.createShader(type); gl.shaderSource(s,src); gl.compileShader(s);
+    if(!gl.getShaderParameter(s,gl.COMPILE_STATUS)) console.error(gl.getShaderInfoLog(s)); return s; }
+  function setupGL(){
+    if(!gl){ photo.style.visibility="visible"; return; }   // sin WebGL: foto quieta
+    prog=gl.createProgram();
+    gl.attachShader(prog,sh(gl.VERTEX_SHADER,"attribute vec2 p;varying vec2 uv;void main(){uv=vec2(p.x*.5+.5,.5-p.y*.5);gl_Position=vec4(p,0.,1.);}"));
+    gl.attachShader(prog,sh(gl.FRAGMENT_SHADER,document.getElementById("fs").textContent));
+    gl.linkProgram(prog); gl.useProgram(prog);
+    var buf=gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER,buf);
+    gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,1,1]),gl.STATIC_DRAW);
+    var loc=gl.getAttribLocation(prog,"p"); gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc,2,gl.FLOAT,false,0,0);
+    var tex=gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D,tex);
+    gl.texImage2D(gl.TEXTURE_2D,0,gl.RGB,gl.RGB,gl.UNSIGNED_BYTE,photo);
+    [gl.TEXTURE_WRAP_S,gl.TEXTURE_WRAP_T].forEach(function(k){ gl.texParameteri(gl.TEXTURE_2D,k,gl.CLAMP_TO_EDGE); });
+    gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR); gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
+    uT=gl.getUniformLocation(prog,"t");
+    gl.viewport(0,0,IW,IH);
+  }
+
+  /* ---------- encuadre fijo, cámara en mano ---------- */
+  var scene=document.getElementById("scene"), barT=document.getElementById("barT"), barB=document.getElementById("barB"),
+      frame=document.getElementById("site"), t0=performance.now();
+  function clamp(v,a,b){return v<a?a:v>b?b:v}
+  function cam(now){
+    var w=innerWidth, hh=innerHeight, tt=(now-t0)/1000;
+    var s=Math.max(w/IW,hh/IH)*1.05;
+    if(STILL) tt=0;
+    var dx=Math.sin(tt*.31)*5+Math.sin(tt*.83)*1.6, dy=Math.cos(tt*.27)*3.5+Math.sin(tt*.71)*1.2, rot=Math.sin(tt*.19)*.1;
+    var tx=clamp(w/2-(IW/2-20)*s+dx,w-IW*s,0), ty=clamp(hh/2-(IH/2)*s+dy,hh-IH*s,0);
+    scene.style.transform="translate("+tx+"px,"+ty+"px) scale("+s+") rotate("+rot+"deg)";
+    var bar=Math.max(0,(hh-w/2.0)/2);
+    barT.style.height=barB.style.height=bar+"px";
+    return tt;
+  }
+  function loop(now){
+    var tt=cam(now); if(STILL) tt=(now-t0)/1000;
+    if(prog){ gl.uniform1f(uT,tt); gl.drawArrays(gl.TRIANGLE_STRIP,0,4); }
+    if(!STILL) dust(now);
+    requestAnimationFrame(loop);
+  }
+
+  // la rueda, en cualquier lado del cuarto, maneja el sitio
+  addEventListener("wheel",function(e){
+    e.preventDefault();
+    try{ var w=frame.contentWindow;
+      w.dispatchEvent(new w.WheelEvent("wheel",{deltaX:e.deltaX,deltaY:e.deltaY,deltaMode:e.deltaMode,bubbles:true,cancelable:true})); }catch(err){}
+  },{passive:false});
+  addEventListener("keydown",function(e){
+    try{ var w=frame.contentWindow; w.dispatchEvent(new w.KeyboardEvent("keydown",{key:e.key,code:e.code,bubbles:true})); }catch(err){}
+  });
+  frame.addEventListener("load",function(){
+    try{ var d=frame.contentDocument, st=d.createElement("style"); st.textContent="#lab,#snd{display:none!important}"; d.head.appendChild(st); }catch(e){}
+  });
+
+  /* ---------- polvo flotando en el haz de la ventana ---------- */
+  var dc=document.getElementById("dust"), dx=dc.getContext("2d"), motes=[], dpr=Math.min(devicePixelRatio||1,2);
+  function rs(){ dc.width=innerWidth*dpr; dc.height=innerHeight*dpr; }
+  addEventListener("resize",rs); rs();
+  for(var m=0;m<90;m++) motes.push({x:Math.random(),y:Math.random(),z:.3+Math.random()*.7,ph:Math.random()*6.28,sp:.2+Math.random()*.6});
+  function dust(now){
+    var w=dc.width, hh=dc.height, tt=now/1000;
+    dx.clearRect(0,0,w,hh);
+    for(var i=0;i<motes.length;i++){
+      var o=motes[i];
+      o.y-=.000025*o.sp; o.x+=.00002*Math.sin(tt*.3+o.ph); if(o.y<-.05){o.y=1.05;o.x=Math.random();}
+      var beam=Math.max(0,1-Math.abs((o.x+o.y*.55)-.6)/.3);
+      var a=beam*(.2+.45*o.z)*(.55+.45*Math.sin(tt*o.sp*2+o.ph)); if(a<.01) continue;
+      var r=(1+o.z*2.4)*dpr, px=o.x*w+Math.sin(tt*.2+o.ph)*12*dpr, py=o.y*hh;
+      var g=dx.createRadialGradient(px,py,0,px,py,r*2.2);
+      g.addColorStop(0,"rgba(255,244,225,"+a+")"); g.addColorStop(1,"rgba(255,244,225,0)");
+      dx.fillStyle=g; dx.beginPath(); dx.arc(px,py,r*2.2,0,6.283); dx.fill();
+    }
+  }
+
+  function start(){ setupGL(); requestAnimationFrame(loop); setTimeout(function(){ document.getElementById("black").classList.add("go"); },200); }
+  if(photo.complete && photo.naturalWidth) start(); else photo.onload=start;
+})();
+</script>
+</body>
+</html>

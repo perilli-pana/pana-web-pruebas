@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pana TV</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;overflow:hidden;background:#000}
+
+/* la escena es la foto a su tamaño real (2048x1144); la "cámara" la mueve y la escala */
+#scene{position:absolute;left:0;top:0;width:2048px;height:1144px;transform-origin:0 0}
+#scene img{position:absolute;inset:0;width:100%;height:100%;display:block;user-select:none;-webkit-user-drag:none}
+/* foco: copia desenfocada de la foto, transparente donde está la tele */
+#blur{filter:blur(7px) saturate(.95);opacity:0;
+  -webkit-mask-image:radial-gradient(ellipse 330px 300px at 1000px 500px,transparent 58%,#000 100%);
+          mask-image:radial-gradient(ellipse 330px 300px at 1000px 500px,transparent 58%,#000 100%)}
+
+/* pantalla: 1320x1080 (4:3 aprox), mapeada en perspectiva sobre el vidrio de la tele */
+#scr{position:absolute;left:0;top:0;width:1320px;height:1080px;transform-origin:0 0;overflow:hidden;
+  border-radius:90px/80px;background:#000}
+#site{position:absolute;left:-300px;top:0;width:1920px;height:1080px;border:0;background:#000}
+#scr .fx{position:absolute;inset:0;pointer-events:none;border-radius:inherit}
+.scan{background:repeating-linear-gradient(to bottom,rgba(0,0,0,.32) 0 2px,transparent 2px 5px)}
+.mask{background:repeating-linear-gradient(to right,rgba(255,40,30,.07) 0 2px,rgba(0,0,0,.12) 2px 4px,transparent 4px 6px);mix-blend-mode:screen}
+.roll{height:200%;background:linear-gradient(to bottom,transparent 40%,rgba(255,255,255,.045) 48%,rgba(255,255,255,.07) 50%,transparent 56%);animation:roll 8s linear infinite}
+@keyframes roll{from{transform:translateY(-50%)}to{transform:translateY(0)}}
+.vig{box-shadow:inset 0 0 220px 70px rgba(0,0,0,.9),inset 0 0 40px 12px rgba(0,0,0,.95)}
+/* reflejo de la ventana (la luz entra desde la izquierda) */
+.glass{background:
+  radial-gradient(ellipse 45% 70% at 8% 30%,rgba(255,236,205,.16),transparent 70%),
+  linear-gradient(105deg,rgba(255,240,215,.10) 0%,rgba(255,240,215,.03) 30%,transparent 42%),
+  radial-gradient(ellipse 70% 35% at 55% 6%,rgba(255,255,255,.07),transparent 70%);mix-blend-mode:screen}
+.flick{background:#fff;mix-blend-mode:overlay;animation:fl .1s steps(2) infinite}
+@keyframes fl{0%{opacity:.01}50%{opacity:.035}}
+
+/* la luz de la tele cae sobre el cuarto */
+#spill{position:absolute;inset:0;pointer-events:none;mix-blend-mode:screen;
+  background:radial-gradient(ellipse 330px 260px at 1007px 470px,rgba(255,50,25,.28),rgba(255,50,25,.08) 55%,transparent 100%),
+             radial-gradient(ellipse 600px 260px at 1000px 760px,rgba(255,50,25,.07),transparent 70%)}
+
+/* polvo en el haz de luz */
+#dust{position:fixed;inset:0;pointer-events:none;mix-blend-mode:screen}
+
+/* acabado de película: tono, grano, viñeta, franjas de cine */
+#tone{position:fixed;inset:0;pointer-events:none;mix-blend-mode:soft-light;background:linear-gradient(180deg,rgba(255,190,120,.10),rgba(40,60,110,.10))}
+#grain{position:fixed;inset:-50%;width:200%;height:200%;pointer-events:none;opacity:.2;mix-blend-mode:overlay;animation:gr .4s steps(3) infinite;
+  background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='260' height='260'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>")}
+@keyframes gr{0%{transform:translate(0,0)}33%{transform:translate(-2%,1.5%)}66%{transform:translate(1.5%,-2%)}}
+#vign{position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse 85% 85% at 50% 50%,transparent 45%,rgba(0,0,0,.6))}
+.bar{position:fixed;left:0;right:0;height:0;background:#000;pointer-events:none}
+#barT{top:0} #barB{bottom:0}
+
+/* atrapa la rueda mientras la cámara viaja */
+#catch{position:fixed;inset:0;cursor:pointer}
+#catch.off{pointer-events:none}
+#hint{position:fixed;left:50%;bottom:6.5vh;transform:translateX(-50%);pointer-events:none;
+  font:500 11px/1 -apple-system,Helvetica,sans-serif;letter-spacing:.35em;text-transform:uppercase;color:rgba(255,240,225,.6);transition:opacity .8s}
+#hint i{display:block;width:1px;height:28px;margin:10px auto 0;background:linear-gradient(rgba(255,240,225,.6),transparent);animation:dr 2s ease-in-out infinite}
+@keyframes dr{0%{transform:scaleY(0);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}51%{transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+@media (prefers-reduced-motion:reduce){.roll,.flick,#grain,#hint i{animation:none}}
+</style>
+</head>
+<body>
+<div id="scene">
+  <img id="photo" src="escena.jpg" alt="">
+  <img id="blur" src="escena.jpg" alt="">
+  <div id="scr">
+    <iframe id="site" src="../index.html?fx=mobius#1" allow="autoplay" title="Estudio Pana"></iframe>
+    <div class="fx mask"></div><div class="fx scan"></div><div class="fx roll"></div><div class="fx flick"></div>
+    <div class="fx vig"></div><div class="fx glass"></div>
+  </div>
+  <div id="spill"></div>
+</div>
+<canvas id="dust"></canvas>
+<div id="tone"></div><div id="grain"></div><div id="vign"></div>
+<div class="bar" id="barT"></div><div class="bar" id="barB"></div>
+<div id="catch"></div>
+<div id="hint">scroll<i></i></div>
+
+<script>
+(function(){
+  var IW=2048, IH=1144;
+  // esquinas del vidrio en la foto (px de la imagen 2048x1144): sup-izq, sup-der, inf-der, inf-izq
+  var Q=[[867,361],[1146,363],[1145,590],[869,600]];
+  var SC={x:1007,y:478,h:225};                // centro y alto de la pantalla en la foto
+
+  /* ---------- pantalla en perspectiva (homografía) ---------- */
+  function solve(A,b){var n=b.length,i,j,k;for(i=0;i<n;i++){var m=i;for(k=i+1;k<n;k++)if(Math.abs(A[k][i])>Math.abs(A[m][i]))m=k;
+    var t=A[i];A[i]=A[m];A[m]=t;t=b[i];b[i]=b[m];b[m]=t;for(k=i+1;k<n;k++){var f=A[k][i]/A[i][i];for(j=i;j<n;j++)A[k][j]-=f*A[i][j];b[k]-=f*b[i];}}
+    var x=new Array(n);for(i=n-1;i>=0;i--){var s=b[i];for(j=i+1;j<n;j++)s-=A[i][j]*x[j];x[i]=s/A[i][i];}return x;}
+  var W=1320,H=1080,src=[[0,0],[W,0],[W,H],[0,H]],A=[],b=[];
+  for(var i=0;i<4;i++){var x=src[i][0],y=src[i][1],u=Q[i][0],v=Q[i][1];
+    A.push([x,y,1,0,0,0,-u*x,-u*y]);b.push(u);A.push([0,0,0,x,y,1,-v*x,-v*y]);b.push(v);}
+  var h=solve(A,b);
+  document.getElementById("scr").style.transform="matrix3d("+[h[0],h[3],0,h[6],h[1],h[4],0,h[7],0,0,1,0,h[2],h[5],0,1].join(",")+")";
+
+  /* ---------- cámara ---------- */
+  var scene=document.getElementById("scene"), blur=document.getElementById("blur"), spill=document.getElementById("spill"),
+      barT=document.getElementById("barT"), barB=document.getElementById("barB"),
+      catcher=document.getElementById("catch"), hint=document.getElementById("hint"), frame=document.getElementById("site");
+  var p=0, pT=0, inside=false, swallow=0, t0=performance.now();
+  function clamp(v,a,b){return v<a?a:v>b?b:v}
+  function ease(t){return t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2}
+
+  function frameCam(now){
+    var w=innerWidth, hh=innerHeight;
+    var s0=Math.max(w/IW,hh/IH)*1.04;                      // plano abierto (llena la ventana)
+    var s1=Math.min(hh*.58/SC.h, w*.55/(SC.h*1.24));       // primer plano de la tele
+    var e=ease(p), s=s0+(s1-s0)*e;
+    // centro: abierto = un poco a la izquierda del centro de la foto; cerrado = la pantalla
+    var cx0=IW/2-30, cy0=IH/2, cx=cx0+(SC.x-cx0)*e, cy=cy0+(SC.y-cy0)*e;
+    // cámara en mano: deriva mínima
+    var tt=(now-t0)/1000, amp=(1-e*.6);
+    var dx=(Math.sin(tt*.31)*6+Math.sin(tt*.83)*2)*amp, dy=(Math.cos(tt*.27)*4+Math.sin(tt*.71)*1.5)*amp, rot=Math.sin(tt*.19)*.12*amp;
+    var tx=w/2-cx*s+dx, ty=hh/2-cy*s+dy;
+    // que nunca se vea el borde de la foto
+    tx=clamp(tx,w-IW*s,0); ty=clamp(ty,hh-IH*s,0);
+    scene.style.transform="translate("+tx+"px,"+ty+"px) scale("+s+") rotate("+rot+"deg)";
+    blur.style.opacity=(e*.95).toFixed(3);
+    var bar=(1-e)*Math.max(0,(hh-w/2.0)/2);                // franjas de cine en el plano abierto
+    barT.style.height=barB.style.height=bar+"px";
+    hint.style.opacity=p<.02?1:0;
+    // la tele "respira": el CRT nunca es parejo
+    spill.style.opacity=(1-e*.5)*(.85+Math.sin(tt*9)*.04+Math.sin(tt*23.7)*.03).toFixed(3);
+  }
+  function loop(now){
+    p+= (pT-p)*.06; if(Math.abs(pT-p)<.0005) p=pT;
+    var wasInside=inside; inside=(p>=.999);
+    catcher.classList.toggle("off",inside);
+    if(inside&&!wasInside) swallow=now+700;                 // la inercia del trackpad no saltea secciones
+    frameCam(now); dust(now);
+    requestAnimationFrame(loop);
+  }
+
+  // rueda mientras viaja la cámara
+  addEventListener("wheel",function(e){
+    e.preventDefault();
+    var now=performance.now();
+    if(!inside){ pT=clamp(pT+e.deltaY*.0011,0,1); return; }
+    if(now<swallow) return;
+    // ya adentro y scrolleando fuera de la pantalla: subir en el inicio = alejarse; lo demás lo maneja el sitio
+    if(e.deltaY<0 && siteAtHome()){ pT=clamp(pT+e.deltaY*.0011,0,1); return; }
+    try{ var w=frame.contentWindow;
+      w.dispatchEvent(new w.WheelEvent("wheel",{deltaX:e.deltaX,deltaY:e.deltaY,deltaMode:e.deltaMode,bubbles:true,cancelable:true})); }catch(err){}
+  },{passive:false});
+  catcher.addEventListener("click",function(){ pT=1; });
+  addEventListener("keydown",function(e){
+    if(!inside){ if(e.key==="ArrowDown"||e.key===" "||e.key==="Enter"){ pT=1; e.preventDefault(); } return; }
+    if(e.key==="Escape"){ pT=0; return; }
+    try{ var w=frame.contentWindow; w.dispatchEvent(new w.KeyboardEvent("keydown",{key:e.key,code:e.code,bubbles:true})); }catch(err){}
+  });
+
+  function siteAtHome(){
+    try{ var d=frame.contentDocument, est=d.getElementById("estudio"), fx=frame.contentWindow.panaFX;
+      return parseFloat(est.style.opacity||"1")>.98 && (!fx||fx.state.ip<.01) && !d.querySelector(".detail.open");
+    }catch(e){ return false; }
+  }
+  // adentro del sitio: subir estando en el inicio también aleja la cámara
+  frame.addEventListener("load",function(){
+    try{
+      var d=frame.contentDocument, st=d.createElement("style");
+      st.textContent="#lab,#snd{display:none!important}"; d.head.appendChild(st);
+      frame.contentWindow.addEventListener("wheel",function(e){
+        if(e.deltaY<0 && inside && performance.now()>swallow && siteAtHome()){ pT=clamp(pT+e.deltaY*.0011,0,1); }
+      },{passive:true});
+      frame.contentWindow.addEventListener("keydown",function(e){ if(e.key==="Escape" && siteAtHome()) pT=0; });
+    }catch(e){}
+  });
+
+  /* ---------- polvo flotando en el haz de la ventana ---------- */
+  var cv=document.getElementById("dust"), cx=cv.getContext("2d"), motes=[], dpr=Math.min(devicePixelRatio||1,2);
+  function rs(){ cv.width=innerWidth*dpr; cv.height=innerHeight*dpr; }
+  addEventListener("resize",rs); rs();
+  for(var m=0;m<70;m++) motes.push({x:Math.random(),y:Math.random(),z:.3+Math.random()*.7,ph:Math.random()*6.28,sp:.2+Math.random()*.6});
+  function dust(now){
+    var w=cv.width, hh=cv.height, tt=now/1000, e=ease(p);
+    cx.clearRect(0,0,w,hh);
+    var fade=1-e*.85;
+    for(var i=0;i<motes.length;i++){
+      var o=motes[i];
+      o.y-=.00003*o.sp; o.x+=.00002*Math.sin(tt*.3+o.ph); if(o.y<-.05){o.y=1.05;o.x=Math.random();}
+      // el haz entra por la ventana (izquierda) y cruza en diagonal: más polvo visible ahí
+      var beam=Math.max(0,1-Math.abs((o.x*1.0+o.y*.55)-.62)/.32);
+      var a=beam*(.25+.45*o.z)*(.6+.4*Math.sin(tt*o.sp*2+o.ph))*fade; if(a<.01) continue;
+      var r=(1.2+o.z*2.6)*dpr*(1+e*1.5);
+      var px=o.x*w+Math.sin(tt*.2+o.ph)*12*dpr, py=o.y*hh;
+      var g=cx.createRadialGradient(px,py,0,px,py,r*2.2);
+      g.addColorStop(0,"rgba(255,244,225,"+a+")"); g.addColorStop(1,"rgba(255,244,225,0)");
+      cx.fillStyle=g; cx.beginPath(); cx.arc(px,py,r*2.2,0,6.283); cx.fill();
+    }
+  }
+
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>
